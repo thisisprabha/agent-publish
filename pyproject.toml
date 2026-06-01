@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-publish"
+version = "0.1.0"
+description = "Markdown-to-HTML pipeline for AI agents"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "markdown>=3.5",
+    "toml>=0.10.2",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "black", "ruff"]
+
+[project.scripts]
+agent-publish = "agent_publish.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/thisisprabha/agent-publish"
+Repository = "https://github.com/thisisprabha/agent-publish"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_publish"]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "I"]

@@ -1,0 +1,16 @@
+[output]
+theme = "default"
+base_url = "https://yourusername.github.io/your-repo"
+content_dir = "sketch"
+
+[github]
+repo_path = "~/Projects/your-github-pages-repo"
+auto_push = true
+commit_prefix = "📦"
+
+[patterns]
+exclude = ["draft", "wip", "_private"]
+
+[validation]
+verify_reachable = true
+max_redirects = 3
