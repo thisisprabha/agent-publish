@@ -11,6 +11,7 @@ license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
     "markdown>=3.5",
+    "pygments>=2.15",
     "toml>=0.10.2",
     "rich>=13.0",
 ]
@@ -30,6 +31,10 @@ packages = ["src/agent_publish"]
 
 [tool.black]
 line-length = 88
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 88

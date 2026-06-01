@@ -3,7 +3,6 @@
 from pathlib import Path
 from typing import Optional
 
-
 DEFAULT_CSS = """:root{
   --bg:#faf8f5;--fg:#1c1917;--muted:#78716c;--accent:#0077b6;
   --accent-2:#48cae4;--border:#e7e5e4;--surface:#fff;--code-bg:#f5f5f0

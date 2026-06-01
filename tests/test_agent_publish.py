@@ -1,9 +1,9 @@
 """Tests for agent-publish."""
 
-from pathlib import Path
 import tempfile
+from pathlib import Path
 
-from agent_publish.converter import convert_file, _generate_fingerprint, _clean_slug
+from agent_publish.converter import _clean_slug, _generate_fingerprint, convert_file
 from agent_publish.state import check_duplicate, save_fingerprint
 from agent_publish.validator import Validator
 
@@ -64,12 +64,15 @@ def test_validator():
 
 def test_state_dedup():
     """Test fingerprint deduplication."""
-    is_dup, fp = check_duplicate("test-key", "content")
+    import uuid
+    key = f"test-key-{uuid.uuid4().hex[:8]}"
+    
+    is_dup, fp = check_duplicate(key, "content")
     assert not is_dup
     
-    save_fingerprint("test-key", fp)
+    save_fingerprint(key, fp)
     
-    is_dup, fp2 = check_duplicate("test-key", "content")
+    is_dup, fp2 = check_duplicate(key, "content")
     assert is_dup
 
 
