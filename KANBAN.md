@@ -7,9 +7,11 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Done
 
-*No completed tasks yet. Starting sprint June 2, 2026.*
-- [ ] **AP-001**: Scaffold core converter module (`src/agent_publish/converter.py`) - markdown → HTML with Jinja2 templates | Est: 90min | Skills: python, jinja2
-- [ ] **AP-002**: Create base CSS system inline (no external deps) - clean minimal style, mobile-responsive | Est: 60min | Skills: css
+- [x] **AP-001**: Scaffold core converter module (`src/agent_publish/converter.py`) - markdown → HTML with Jinja2 templates | Completed: 2026-06-02
+- [x] **AP-002**: Create base CSS system inline (no external deps) - clean minimal style, mobile-responsive | Completed: 2026-06-02
+- [x] **AP-003**: Add CLI entry point with argparse - `agent-publish convert input.md --output-dir ./dist` | Est: 45min | Completed: 2026-06-02
+- [x] **AP-004**: GitHub Pages auto-deployment helper - push built HTML to `gh-pages` branch | Est: 90min | Completed: 2026-06-02
+- [x] **AP-010**: Eval/test suite - sample markdowns → HTML → verify structure | Est: 90min | Completed: 2026-06-02
 
 ---
 
@@ -27,9 +29,10 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-*Cron pulls top 2 cards from here at 1AM IST daily.*
-- [ ] **AP-003**: Add CLI entry point with argparse - `agent-publish convert input.md --output-dir ./dist` | Est: 45min
-- [ ] **AP-004**: GitHub Pages auto-deployment helper - push built HTML to `gh-pages` branch | Est: 90min
+- [ ] **AP-005**: Config file support (YAML) - custom CSS paths, template overrides | Est: 60min
+- [ ] **AP-007**: Image path resolution + copy to output directory | Est: 45min
+- [ ] **AP-008**: Table of contents generator from H2/H3 headers | Est: 45min
+- [ ] **AP-011**: README polish with usage examples + GIF demo | Est: 60min
 
 ---
 
