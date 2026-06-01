@@ -11,7 +11,7 @@ import subprocess
 import datetime
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).parent.parent.parent
+REPO_ROOT = Path(__file__).parent.parent
 KANBAN_PATH = REPO_ROOT / "KANBAN.md"
 MAX_CARDS_PER_RUN = 2
 
