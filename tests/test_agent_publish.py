@@ -385,6 +385,50 @@ def test_converter_no_toc_for_single_header():
         assert '<nav class="toc">' not in html
 
 
+def test_accessibility_skip_link():
+    """Test that generated HTML includes a skip-to-content link."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "a11y.md"
+        input_file.write_text("# A11y Test\n\nContent.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert 'class="skip-link"' in html
+        assert 'href="#main-content"' in html
+        assert 'id="main-content"' in html
+
+
+def test_accessibility_focus_visible():
+    """Test that generated HTML CSS includes focus-visible outlines."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "focus.md"
+        input_file.write_text("# Focus Test\n\nContent.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert ':focus-visible' in html
+
+
+def test_responsive_breakpoints():
+    """Test that generated HTML includes responsive media queries."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "resp.md"
+        input_file.write_text("# Responsive Test\n\nContent.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert '(max-width:640px)' in html
+        assert '(max-width:1024px)' in html
+
+
+def test_print_stylesheet():
+    """Test that generated HTML includes print media rules."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "print.md"
+        input_file.write_text("# Print Test\n\nContent.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert '@media print' in html
+        assert '.skip-link{display:none}' in html
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -407,4 +451,8 @@ if __name__ == "__main__":
     test_converter_with_image()
     test_converter_generates_toc()
     test_converter_no_toc_for_single_header()
+    test_accessibility_skip_link()
+    test_accessibility_focus_visible()
+    test_responsive_breakpoints()
+    test_print_stylesheet()
     print("All tests passed!")

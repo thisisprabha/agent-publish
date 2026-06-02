@@ -70,6 +70,7 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to content</a>
 <a href="../" class="back">&larr; Back</a>
 
 <header>
@@ -77,7 +78,7 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
   <p class="meta">{entry_type} &middot; {date} &middot; <code>{fingerprint}</code></p>
 </header>
 
-<main class="main">
+<main class="main" id="main-content">
 {body}
 </main>
 </body>
