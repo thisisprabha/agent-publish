@@ -43,9 +43,9 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ### Phase 1: Bug fixes (do these first)
 
-- [ ] **AP-015**: Remove orphaned `state.py` — duplicate fingerprint system that's never called from cli.py or converter.py. Publisher has its own cache. Delete state.py, remove its tests if any, keep publisher cache as single source of truth. | Est: 20min | Skills: python
-- [ ] **AP-016**: Add `--version` flag to CLI using version from pyproject.toml | Est: 15min | Skills: python
-- [ ] **AP-017**: Fix validator `verify_file` — H1 regex fails on titles with inline HTML or attributes. Use proper HTML parser (html.parser) instead of regex. | Est: 30min | Skills: python
+- [x] **AP-015**: Remove orphaned `state.py` — duplicate fingerprint system that's never called from cli.py or converter.py. Publisher has its own cache. Delete state.py, remove its tests if any, keep publisher cache as single source of truth. | Completed: 2026-06-03
+- [x] **AP-016**: Add `--version` flag to CLI using version from pyproject.toml | Completed: 2026-06-03
+- [x] **AP-017**: Fix validator `verify_file` — H1 regex fails on titles with inline HTML or attributes. Use proper HTML parser (html.parser) instead of regex. | Completed: 2026-06-03
 
 ### Phase 2: CSS polish + transitions
 
