@@ -116,6 +116,12 @@ def convert_file(
     ])
 
     html_body = md.convert(md_content)
+    toc_html = md.toc if hasattr(md, 'toc') else ""  # type: ignore[attr-defined]
+
+    # If TOC has at least 2 entries (meaningful nav), wrap and prepend
+    if toc_html and toc_html.count('<a href="#') >= 2:
+        toc_nav = f'<nav class="toc">{toc_html}</nav>\n'
+        html_body = toc_nav + html_body
 
     # Resolve CSS
     if custom_css_path and custom_css_path.exists():

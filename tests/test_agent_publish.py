@@ -247,6 +247,38 @@ def test_converter_with_image():
         assert 'src="images/diagram.png"' in html
 
 
+def test_converter_generates_toc():
+    """Test that multi-header markdown gets a table of contents."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "toc-test.md"
+        input_file.write_text(
+            "# Top Level\n\nIntro.\n\n"
+            "## Section A\n\nContent A.\n\n"
+            "### Sub A1\n\nDeep.\n\n"
+            "## Section B\n\nContent B.\n"
+        )
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+
+        assert '<nav class="toc">' in html
+        assert 'href="#section-a"' in html
+        assert 'href="#sub-a1"' in html
+        assert 'href="#section-b"' in html
+        assert 'id="section-a"' in html
+        assert 'id="sub-a1"' in html
+
+
+def test_converter_no_toc_for_single_header():
+    """Test that docs with only an h1 don't get a TOC."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "no-toc.md"
+        input_file.write_text("# Just Title\n\nOnly one level of heading.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+
+        assert '<nav class="toc">' not in html
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -264,4 +296,6 @@ if __name__ == "__main__":
     test_copy_assets_rewrites_src()
     test_copy_assets_skips_remote()
     test_converter_with_image()
+    test_converter_generates_toc()
+    test_converter_no_toc_for_single_header()
     print("All tests passed!")

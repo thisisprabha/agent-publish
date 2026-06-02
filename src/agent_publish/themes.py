@@ -31,7 +31,13 @@ blockquote{border-left:3px solid var(--accent-2);margin:1.75rem 0;padding:.5rem 
 code{background:var(--code-bg);padding:.18em .45em;border-radius:4px;font-size:.85em;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;color:var(--fg)}
 pre{background:var(--code-bg);padding:1rem 1.25rem;border-radius:8px;overflow-x:auto;font-size:.82rem;margin:1.25rem 0;line-height:1.6;border:1px solid var(--border)}
 pre code{background:none;padding:0;font-size:inherit}
-@media print{body{background:#fff}a[href]:after{content:" (" attr(href) ")";font-size:.75rem;color:var(--muted)}.back{display:none}}
+.toc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin:0 0 1.75rem;font-size:.8125rem}
+.toc ul{list-style:none;padding-left:0;margin:0}
+.toc ul ul{padding-left:1.1rem;margin-top:.2rem}
+.toc li{margin:0 0 .15rem}
+.toc a{color:var(--accent);text-decoration:none;border-bottom:0}
+.toc a:hover{text-decoration:underline}
+@media print{body{background:#fff}a[href]:after{content:" (" attr(href) ")";font-size:.75rem;color:var(--muted)}.back{display:none}.toc{display:none}}
 """.strip()
 
 
