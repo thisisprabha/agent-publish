@@ -51,7 +51,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 - [x] **AP-009**: Dark mode CSS — add `@media (prefers-color-scheme: dark)` block to all three themes. Dark variants: default (warm dark), minimal (true black), brutalist (light alt). Test with sample HTML. | Completed: 2026-06-03
 - [x] **AP-018**: CSS transitions — add smooth scroll (`html { scroll-behavior: smooth }`), heading anchor hover reveal, table row hover highlight (`tr:hover`), link underline transition, code block hover border. All three themes. Zero JS. | Completed: 2026-06-03
-- [ ] **AP-019**: Fix brutalist theme — missing styles for `.meta`, `.back`, `blockquote`, `pre code`. Add responsive rules. Complete the theme so it's actually usable. | Est: 30min | Skills: css
+- [x] **AP-019**: Fix brutalist theme — missing styles for `.meta`, `.back`, `blockquote`, `pre code`. Add responsive rules. Complete the theme so it's actually usable. | Completed: 2026-06-03 | Skills: css
 - [ ] **AP-020**: Accessibility pass — add `:focus-visible` outlines, skip-to-content link in template, `aria-label` on nav elements, ensure color contrast meets WCAG AA in all themes. | Est: 45min | Skills: css, html
 - [ ] **AP-021**: Responsive breakpoints — add `@media` queries for mobile (<640px) and tablet (<1024px) to all themes. Test: heading sizes, table horizontal scroll, code block overflow. | Est: 45min | Skills: css
 - [ ] **AP-022**: Print stylesheet — add `@media print` to minimal and brutalist (default already has one). Hide nav, expand links, ensure clean page breaks. | Est: 30min | Skills: css
