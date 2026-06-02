@@ -34,8 +34,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-013**: Fix `template.format()` crash — user markdown containing `{braces}` causes KeyError. Replace `.format()` with safe substitution (e.g., `string.Template` or manual replace). Add test with markdown containing `{example}` text. | Est: 30min | Skills: python
-- [ ] **AP-014**: Fix empty slug edge case — `_clean_slug()` returns empty string for titles with all special chars, producing filenames like `2024-01-01-.html`. Add fallback to "untitled" + add test. | Est: 20min | Skills: python
+- [x] **AP-013**: Fix `template.format()` crash — user markdown containing `{braces}` causes KeyError. Replace `.format()` with safe substitution (e.g., `string.Template` or manual replace). Add test with markdown containing `{example}` text. | Completed: 2026-06-02
+- [x] **AP-014**: Fix empty slug edge case — `_clean_slug()` returns empty string for titles with all special chars, producing filenames like `2024-01-01-.html`. Add fallback to "untitled" + add test. | Completed: 2026-06-02
 
 ---
 

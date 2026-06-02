@@ -33,6 +33,14 @@ def _extract_title(md_content: str) -> str:
     return "Untitled"
 
 
+def _safe_format(template: str, **kwargs) -> str:
+    """Replace {key} placeholders safely without interpreting other braces."""
+    result = template
+    for key, value in kwargs.items():
+        result = result.replace(f"{{{key}}}", str(value))
+    return result
+
+
 def _clean_slug(title: str) -> str:
     """Generate URL-safe slug from title."""
     # Strip common prefixes
@@ -47,7 +55,8 @@ def _clean_slug(title: str) -> str:
     # Clean special chars
     slug = re.sub(r'[^a-zA-Z0-9\s-]', ' ', cleaned.strip())
     slug = re.sub(r'\s+', '-', slug)
-    return re.sub(r'-+', '-', slug).lower()[:60]
+    slug = re.sub(r'-+', '-', slug).strip('-').lower()[:60]
+    return slug if slug else "untitled"
 
 
 DEFAULT_TEMPLATE = '''<!DOCTYPE html>
@@ -142,7 +151,8 @@ def convert_file(
     else:
         template = DEFAULT_TEMPLATE
 
-    html = template.format(
+    html = _safe_format(
+        template,
         title=title,
         css=css,
         fingerprint=fingerprint,

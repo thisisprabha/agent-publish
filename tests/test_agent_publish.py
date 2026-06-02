@@ -27,6 +27,8 @@ def test_clean_slug():
     assert _clean_slug("Cron Job: Daily Report") == "daily-report"
     assert _clean_slug("Research Report: Findings") == "findings"
     assert _clean_slug("2024-01-01 10:00 - Meeting Notes") == "meeting-notes"
+    assert _clean_slug("!!! @@@ ###") == "untitled"
+    assert _clean_slug("---") == "untitled"
 
 
 def test_converter():
@@ -79,6 +81,25 @@ def test_converter_template_override():
         assert '<div class="fp">' in html
         assert '<div class="body">' in html
         assert "<h1>Templated</h1>" in html
+
+
+def test_converter_braces_in_markdown():
+    """Test that markdown containing {braces} doesn't crash template formatting."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "test.md"
+        input_file.write_text(
+            "# Braces Test\n\n"
+            "Here is a Python f-string: `name = {example}`\n\n"
+            "And a dict literal: `data = {{'key': 'value'}}`\n"
+        )
+        
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        
+        assert result.title == "Braces Test"
+        assert "{example}" in html
+        assert "{{'key': 'value'}}" in html
+        assert "<h1>Braces Test</h1>" in html
 
 
 def test_validator():
