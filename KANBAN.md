@@ -11,6 +11,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-002**: Create base CSS system inline (no external deps) - clean minimal style, mobile-responsive | Completed: 2026-06-02
 - [x] **AP-003**: Add CLI entry point with argparse - `agent-publish convert input.md --output-dir ./dist` | Est: 45min | Completed: 2026-06-02
 - [x] **AP-004**: GitHub Pages auto-deployment helper - push built HTML to `gh-pages` branch | Est: 90min | Completed: 2026-06-02
+- [x] **AP-005**: Config file support (YAML) - custom CSS paths, template overrides | Est: 60min | Completed: 2026-06-02
+- [x] **AP-007**: Image path resolution + copy to output directory | Est: 45min | Completed: 2026-06-02
 - [x] **AP-010**: Eval/test suite - sample markdowns → HTML → verify structure | Est: 90min | Completed: 2026-06-02
 
 ---

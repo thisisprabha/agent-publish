@@ -2,9 +2,9 @@
 
 import hashlib
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import markdown
 from markdown.extensions.codehilite import CodeHiliteExtension
@@ -17,6 +17,7 @@ class ConversionResult:
     title: str
     fingerprint: str
     output_path: Path
+    assets_copied: List[Path] = field(default_factory=list)
 
 
 def _generate_fingerprint(content: str) -> str:
@@ -49,9 +50,29 @@ def _clean_slug(title: str) -> str:
     return re.sub(r'-+', '-', slug).lower()[:60]
 
 
-def _inline_css(theme_css: str) -> str:
-    """Wrap theme CSS as inline block."""
-    return theme_css
+DEFAULT_TEMPLATE = '''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<style>
+{css}
+</style>
+</head>
+<body>
+<a href="../" class="back">&larr; Back</a>
+
+<header>
+  <h1>{title}</h1>
+  <p class="meta">{entry_type} &middot; {date} &middot; <code>{fingerprint}</code></p>
+</header>
+
+<main class="main">
+{body}
+</main>
+</body>
+</html>'''
 
 
 def convert_file(
@@ -59,6 +80,8 @@ def convert_file(
     output_dir: Path,
     entry_type: str = "daily",
     custom_css: Optional[str] = None,
+    custom_css_path: Optional[Path] = None,
+    template_override: Optional[Path] = None,
     date_str: Optional[str] = None,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
@@ -67,7 +90,9 @@ def convert_file(
         input_path: Path to input markdown file
         output_dir: Directory for output HTML
         entry_type: Category for metadata (daily, weekly, etc.)
-        custom_css: Optional custom CSS to override default
+        custom_css: Optional custom CSS string to override default
+        custom_css_path: Optional path to custom CSS file (takes precedence over custom_css)
+        template_override: Optional path to template file with {title}, {css}, {fingerprint}, {date}, {body}, {entry_type} placeholders
         date_str: Optional date string (defaults to today)
 
     Returns:
@@ -92,35 +117,37 @@ def convert_file(
 
     html_body = md.convert(md_content)
 
+    # Resolve CSS
+    if custom_css_path and custom_css_path.exists():
+        css = custom_css_path.read_text(encoding='utf-8')
+    else:
+        css = custom_css or DEFAULT_CSS
+
     # Inline pygments CSS for syntax highlighting
     pyg_css = HtmlFormatter(style="default").get_style_defs(".codehilite")
-    css = (custom_css or DEFAULT_CSS) + "\n" + pyg_css
+    css = css + "\n" + pyg_css
+
     date = date_str or __import__('datetime').datetime.now().strftime("%Y-%m-%d")
     slug = _clean_slug(title)
 
-    html = f'''<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
-<style>
-{css}
-</style>
-</head>
-<body>
-<a href="../" class="back">&larr; Back</a>
+    # Resolve template
+    if template_override and template_override.exists():
+        template = template_override.read_text(encoding='utf-8')
+    else:
+        template = DEFAULT_TEMPLATE
 
-<header>
-  <h1>{title}</h1>
-  <p class="meta">{entry_type.capitalize()} &middot; {date} &middot; <code>{fingerprint}</code></p>
-</header>
+    html = template.format(
+        title=title,
+        css=css,
+        fingerprint=fingerprint,
+        date=date,
+        body=html_body,
+        entry_type=entry_type.capitalize(),
+    )
 
-<main class="main">
-{html_body}
-</main>
-</body>
-</html>'''
+    from agent_publish.assets import copy_assets
+
+    html, assets_copied = copy_assets(html, base_dir=input_path.parent, output_dir=output_dir)
 
     output_name = f"{date}-{slug}.html"
     output_path = output_dir / output_name
@@ -132,4 +159,5 @@ def convert_file(
         title=title,
         fingerprint=fingerprint,
         output_path=output_path,
+        assets_copied=assets_copied,
     )

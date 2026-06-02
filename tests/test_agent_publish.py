@@ -3,6 +3,8 @@
 import tempfile
 from pathlib import Path
 
+import pytest
+
 from agent_publish.converter import _clean_slug, _generate_fingerprint, convert_file
 from agent_publish.state import check_duplicate, save_fingerprint
 from agent_publish.validator import Validator
@@ -45,6 +47,40 @@ def test_converter():
         assert '<meta charset="UTF-8">' in html
 
 
+def test_converter_custom_css_path():
+    """Test conversion with custom CSS file path."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "test.md"
+        input_file.write_text("# Custom CSS\n\nContent.")
+        css_file = Path(tmp) / "custom.css"
+        css_file.write_text("body { background: #bada55; }")
+        
+        result = convert_file(input_file, Path(tmp), "daily", custom_css_path=css_file)
+        html = result.output_path.read_text()
+        assert "background: #bada55" in html
+
+
+def test_converter_template_override():
+    """Test conversion with a custom template file."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "test.md"
+        input_file.write_text("# Templated\n\nContent.")
+        tpl_file = Path(tmp) / "my.html"
+        tpl_file.write_text(
+            '<!DOCTYPE html><html><head><title>{title}</title></head>'
+            '<body><h1>{title}</h1><div class="date">{date}</div>'
+            '<div class="fp">{fingerprint}</div><style>{css}</style>'
+            '<div class="body">{body}</div></body></html>'
+        )
+        
+        result = convert_file(input_file, Path(tmp), "daily", template_override=tpl_file)
+        html = result.output_path.read_text()
+        assert '<div class="date">' in html
+        assert '<div class="fp">' in html
+        assert '<div class="body">' in html
+        assert "<h1>Templated</h1>" in html
+
+
 def test_validator():
     """Test HTML validation."""
     with tempfile.TemporaryDirectory() as tmp:
@@ -76,10 +112,156 @@ def test_state_dedup():
     assert is_dup
 
 
+# ---- Config tests ----
+
+def test_load_config_toml():
+    """Test loading TOML config."""
+    from agent_publish.config import load_config
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "agent-publish.toml"
+        cfg_path.write_text(
+            '[output]\ntheme = "minimal"\nbase_url = "https://example.com"\n'
+            'content_dir = "notes"\ncustom_css_path = "style.css"\n'
+            '[github]\nrepo_path = "/tmp/repo"\nauto_push = false\n'
+            'commit_prefix = "[pub]"\n'
+            '[validation]\nverify_reachable = false\n'
+        )
+        css_file = Path(tmp) / "style.css"
+        css_file.write_text("body{color:blue}")
+
+        cfg = load_config(cfg_path)
+        assert cfg.theme == "minimal"
+        assert cfg.base_url == "https://example.com"
+        assert cfg.output_dir == "notes"
+        assert cfg.custom_css_path.resolve() == css_file.resolve()
+        assert cfg.github_repo_path == "/tmp/repo"
+        assert cfg.github_auto_push is False
+        assert cfg.github_commit_prefix == "[pub]"
+        assert cfg.validation_verify_reachable is False
+
+
+def test_load_config_yaml():
+    """Test loading YAML config."""
+    from agent_publish.config import load_config
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "agent-publish.yaml"
+        cfg_path.write_text(
+            "output:\n"
+            "  theme: brutalist\n"
+            "  base_url: \"https://yaml.example.com\"\n"
+            "  content_dir: pages\n"
+            "github:\n"
+            "  repo_path: \"/tmp/gh\"\n"
+            "  auto_push: true\n"
+            "  commit_prefix: \"🚀\"\n"
+            "validation:\n"
+            "  verify_reachable: true\n"
+        )
+        cfg = load_config(cfg_path)
+        assert cfg.theme == "brutalist"
+        assert cfg.base_url == "https://yaml.example.com"
+        assert cfg.output_dir == "pages"
+        assert cfg.github_repo_path == "/tmp/gh"
+        assert cfg.github_auto_push is True
+        assert cfg.github_commit_prefix == "🚀"
+
+
+def test_load_config_defaults_when_missing():
+    """Test defaults are applied when config file is missing."""
+    from agent_publish.config import load_config
+    with tempfile.TemporaryDirectory() as tmp:
+        nonexistent = Path(tmp) / "does-not-exist.toml"
+        cfg = load_config(nonexistent)
+        assert cfg.theme == "default"
+        assert cfg.output_dir == "sketch"
+        assert cfg.base_url == ""
+        assert cfg.github_auto_push is True
+
+
+def test_load_config_validates_custom_css_path():
+    """Test FileNotFoundError raised for missing custom CSS."""
+    from agent_publish.config import load_config
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "bad.toml"
+        cfg_path.write_text('[output]\ncustom_css_path = "/nope/missing.css"\n')
+        with pytest.raises(FileNotFoundError):
+            load_config(cfg_path)
+
+
+def test_load_config_validates_template_override():
+    """Test FileNotFoundError raised for missing template override."""
+    from agent_publish.config import load_config
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "bad.yaml"
+        cfg_path.write_text("output:\n  template_override: /nope/missing.html\n")
+        with pytest.raises(FileNotFoundError):
+            load_config(cfg_path)
+
+
+def test_merge_with_cli_args():
+    """Test CLI args override config values."""
+    from agent_publish.config import Config, merge_with_cli_args
+    cfg = Config(theme="default", base_url="https://old.com")
+    merged = merge_with_cli_args(cfg, theme="minimal", base_url="https://new.com")
+    assert merged.theme == "minimal"
+    assert merged.base_url == "https://new.com"
+
+
+# ---- Asset/image tests ----
+
+def test_copy_assets_rewrites_src():
+    """Test that copy_assets rewrites local image src paths."""
+    from agent_publish.assets import copy_assets
+    with tempfile.TemporaryDirectory() as tmp:
+        image = Path(tmp) / "my-image.png"
+        image.write_text("fake-png-data")
+        html = '<p><img src="my-image.png" alt="test"></p>'
+        updated, copied = copy_assets(html, base_dir=Path(tmp), output_dir=Path(tmp))
+        assert len(copied) == 1
+        assert copied[0].exists()
+        assert 'src="images/my-image.png"' in updated
+
+
+def test_copy_assets_skips_remote():
+    """Test that copy_assets leaves remote URLs unchanged."""
+    from agent_publish.assets import copy_assets
+    html = '<p><img src="https://example.com/image.png" alt="remote"></p>'
+    updated, copied = copy_assets(html, base_dir=Path("/tmp"), output_dir=Path("/tmp"))
+    assert not copied
+    assert 'src="https://example.com/image.png"' in updated
+
+
+def test_converter_with_image():
+    """Test markdown conversion copies referenced images."""
+    with tempfile.TemporaryDirectory() as tmp:
+        image = Path(tmp) / "diagram.png"
+        image.write_text("fake-png-data")
+        input_file = Path(tmp) / "report.md"
+        input_file.write_text(f"# Report with Image\n\n![diagram](diagram.png)\n")
+
+        result = convert_file(input_file, Path(tmp), "daily")
+
+        assert result.assets_copied
+        assert any(a.name == "diagram.png" for a in result.assets_copied)
+        html = result.output_path.read_text()
+        assert 'src="images/diagram.png"' in html
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
     test_converter()
+    test_converter_custom_css_path()
+    test_converter_template_override()
     test_validator()
     test_state_dedup()
+    test_load_config_toml()
+    test_load_config_yaml()
+    test_load_config_defaults_when_missing()
+    test_load_config_validates_custom_css_path()
+    test_load_config_validates_template_override()
+    test_merge_with_cli_args()
+    test_copy_assets_rewrites_src()
+    test_copy_assets_skips_remote()
+    test_converter_with_image()
     print("All tests passed!")

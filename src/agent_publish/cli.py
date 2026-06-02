@@ -7,33 +7,12 @@ from pathlib import Path
 from rich.console import Console
 from rich.table import Table
 
+from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .publisher import GitPublisher
 from .validator import Validator
 
 console = Console()
-
-
-def _find_config() -> Path:
-    """Find config file in current directory or home."""
-    cwd_config = Path.cwd() / "agent-publish.toml"
-    if cwd_config.exists():
-        return cwd_config
-    
-    home_config = Path.home() / ".config" / "agent-publish" / "config.toml"
-    if home_config.exists():
-        return home_config
-    
-    return cwd_config  # Fallback
-
-
-def _load_config(config_path: Path) -> dict:
-    """Load TOML config or return defaults."""
-    if not config_path.exists():
-        return {}
-    
-    import toml
-    return toml.load(config_path)
 
 
 def main():
@@ -69,13 +48,24 @@ def main():
     parser.add_argument(
         "--theme",
         choices=["default", "minimal", "brutalist"],
-        default="default",
         help="CSS theme",
     )
     parser.add_argument(
         "--config",
         type=Path,
-        help="Config file path",
+        help="Config file path (TOML or YAML)",
+    )
+    parser.add_argument(
+        "--custom-css",
+        type=Path,
+        dest="custom_css_path",
+        help="Path to custom CSS file",
+    )
+    parser.add_argument(
+        "--template",
+        type=Path,
+        dest="template_override",
+        help="Path to custom HTML template file",
     )
     parser.add_argument(
         "--eval",
@@ -86,20 +76,29 @@ def main():
     args = parser.parse_args()
     
     # Load config
-    config_path = args.config or _find_config()
-    config = _load_config(config_path)
+    cfg = load_config(args.config)
+    cfg = merge_with_cli_args(
+        cfg,
+        theme=args.theme,
+        custom_css_path=args.custom_css_path,
+        template_override=args.template_override,
+        base_url=args.url,
+        repo_path=args.repo,
+    )
     
-    # Merge CLI args with config
-    repo_path = args.repo or Path(config.get("github", {}).get("repo_path", "."))
-    base_url = args.url or config.get("output", {}).get("base_url", "")
+    repo_path = Path(cfg.github_repo_path)
+    base_url = cfg.base_url
     
     if not base_url and not args.dry_run:
         console.print("[red]Error: --url or output.base_url in config required[/red]")
         sys.exit(1)
     
-    # Load theme CSS
+    # Load theme CSS unless custom_css_path is provided
     from . import themes
-    css = themes.load(args.theme)
+    if cfg.custom_css_path:
+        theme_css = themes.load("default", custom_path=cfg.custom_css_path)
+    else:
+        theme_css = themes.load(cfg.theme)
     
     # Process files
     results = []
@@ -113,9 +112,11 @@ def main():
         with console.status(f"[yellow]Converting {input_path.name}...[/yellow]"):
             result = convert_file(
                 input_path=input_path,
-                output_dir=repo_path / "sketch",
+                output_dir=repo_path / cfg.output_dir,
                 entry_type=args.type,
-                custom_css=css,
+                custom_css=theme_css,
+                custom_css_path=cfg.custom_css_path,
+                template_override=cfg.template_override,
             )
         
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -125,13 +126,15 @@ def main():
             publisher = GitPublisher(
                 repo_path=repo_path,
                 base_url=base_url,
-                auto_push=config.get("github", {}).get("auto_push", True),
-                commit_prefix=config.get("github", {}).get("commit_prefix", "📦"),
+                content_dir=cfg.output_dir,
+                auto_push=cfg.github_auto_push,
+                commit_prefix=cfg.github_commit_prefix,
             )
             pub_result = publisher.publish(
                 html_path=result.output_path,
                 title=result.title,
                 fingerprint=result.fingerprint,
+                asset_paths=result.assets_copied,
             )
             
             if pub_result.success:

@@ -1,10 +1,11 @@
 """GitHub Pages publishing with cache-aware deployment."""
 
 import json
+import shutil
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 
 @dataclass
@@ -53,6 +54,7 @@ class GitPublisher:
         html_path: Path,
         title: str,
         fingerprint: str,
+        asset_paths: Optional[List[Path]] = None,
     ) -> PublishResult:
         """Publish HTML file to GitHub Pages.
         
@@ -60,6 +62,7 @@ class GitPublisher:
             html_path: Path to generated HTML file
             title: Content title for commit message
             fingerprint: Content fingerprint for dedup
+            asset_paths: Optional list of asset files to copy alongside the HTML
             
         Returns:
             PublishResult with URL and status
@@ -80,6 +83,15 @@ class GitPublisher:
         target_dir.mkdir(parents=True, exist_ok=True)
         target_path = target_dir / output_name
         target_path.write_text(html_path.read_text(), encoding='utf-8')
+        
+        # Copy any assets
+        if asset_paths:
+            for asset in asset_paths:
+                if asset.exists():
+                    relative = asset.relative_to(asset.parent.parent)
+                    asset_target = target_dir / relative
+                    asset_target.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(asset, asset_target)
         
         # Git operations
         try:
@@ -150,8 +162,9 @@ def publish(
     fingerprint: str,
     repo_path: Path,
     base_url: str,
+    asset_paths: Optional[List[Path]] = None,
     **kwargs,
 ) -> PublishResult:
     """Convenience function for one-off publishing."""
     publisher = GitPublisher(repo_path, base_url, **kwargs)
-    return publisher.publish(html_path, title, fingerprint)
+    return publisher.publish(html_path, title, fingerprint, asset_paths=asset_paths)
