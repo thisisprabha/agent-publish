@@ -65,7 +65,14 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [ ] **AP-028**: Mermaid diagram support — detect ` ```mermaid` fenced blocks, inject mermaid.js CDN script (only when mermaid blocks exist), render client-side. Zero tokens. | Est: 45min | Skills: python, js
 - [ ] **AP-029**: Favicon + site metadata — add favicon support via config (`favicon = "path/to/icon.png"`), generate `<link rel="icon">`. Add site title/author config for consistent headers. | Est: 30min | Skills: python, html
 
-### Phase 4: Open-source readiness
+### Phase 4: Architecture upgrades (inspired by open-design)
+
+- [ ] **AP-036**: DESIGN.md portable theme spec — replace inline CSS strings in `themes.py` with structured Markdown files (`themes/default/DESIGN.md`, `themes/minimal/DESIGN.md`, etc.). Each DESIGN.md defines: color tokens, typography, spacing, layout, motion, and anti-patterns as readable sections. Converter reads DESIGN.md → generates CSS at build time. Non-devs can edit themes without touching Python. Ref: open-design's 9-section DESIGN.md schema. | Est: 120min | Skills: python, css
+- [ ] **AP-037**: Skill-as-folder extensibility — add `skills/` directory pattern where each output type (article, briefing, changelog, deck) is a folder containing `SKILL.md` (instructions + template hints) + `template.html` (custom HTML template) + optional `assets/`. CLI auto-discovers skills: `agent-publish publish report.md --skill briefing`. Drop a folder in, it appears as an option. Ref: open-design's skill-as-folder convention. | Est: 90min | Skills: python
+- [ ] **AP-038**: Anti-slop quality gate — add `validator.py` post-conversion checklist that scores output HTML on 5 dimensions: (1) no repeated filler phrases like "comprehensive analysis", "it's worth noting" (2) heading hierarchy is clean H1→H2→H3 (3) no empty sections (4) code blocks have language tags (5) no orphan links. Run automatically, print warnings. `--strict` flag fails the build on violations. Zero tokens — pure regex/heuristic checks. | Est: 60min | Skills: python
+- [ ] **AP-039**: Deterministic OKLch color palettes — replace hand-picked hex colors in themes with generated OKLch palettes. Define 5 curated visual directions: Editorial (serif, warm), Modern Minimal (sans, neutral), Warm Soft (rounded, muted), Tech Utility (mono, sharp), Brutalist (mono, high contrast). Each direction locks a palette + font stack in DESIGN.md. `--direction editorial` flag on CLI. Prevents theme "freestyle" — colors always harmonize. | Est: 90min | Skills: python, css
+
+### Phase 5: Open-source readiness
 
 - [ ] **AP-011**: README rewrite — accurate feature list matching actual code, install instructions, usage examples, screenshots of all 3 themes + dark mode, architecture diagram, contributing section. | Est: 90min | Skills: docs
 - [ ] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Est: 60min | Skills: python, ci
@@ -73,7 +80,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [ ] **AP-031**: GitHub Actions CI — run pytest on push/PR, lint with ruff, build wheel, test `pip install` from wheel. Badge in README. | Est: 60min | Skills: ci
 - [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
 
-### Phase 5: Optional AI enhancements (tokens only when user opts in)
+### Phase 6: Optional AI enhancements (tokens only when user opts in)
 
 - [ ] **AP-033**: `--humanize` flag architecture — add optional post-processing hook in converter pipeline. When `--humanize` is passed, pipe markdown through an LLM rewrite before HTML conversion. Support `AGENT_PUBLISH_API_KEY` env var. If no key, skip gracefully with warning. Core pipeline stays zero-token. | Est: 90min | Skills: python
 - [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as a styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
@@ -101,6 +108,6 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [ ] **AP-XXX**: Description | Est: time | Skills: skill1, skill2
 ```
 
-**Promotion rule:** When Ready is empty, promote the next 2 cards from the topmost Backlog phase. Phases are ordered: bug fixes → CSS → zero-token features → open-source → AI enhancements.
+**Promotion rule:** When Ready is empty, promote the next 2 cards from the topmost Backlog phase. Phases are ordered: bug fixes → CSS → zero-token features → architecture (open-design inspired) → open-source → AI enhancements.
 
 **Token budget per run:** ~4K loaded context
