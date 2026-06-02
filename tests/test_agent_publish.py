@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from agent_publish.converter import _clean_slug, _generate_fingerprint, convert_file
-from agent_publish.state import check_duplicate, save_fingerprint
 from agent_publish.validator import Validator
 
 
@@ -119,18 +118,104 @@ def test_validator():
         assert result.success
 
 
-def test_state_dedup():
-    """Test fingerprint deduplication."""
+def test_validator_h1_with_attributes():
+    """Test HTML validation passes when h1 has attributes."""
+    with tempfile.TemporaryDirectory() as tmp:
+        html_path = Path(tmp) / "test.html"
+        html_path.write_text(
+            '<!DOCTYPE html><html><head><title>Test</title>'
+            '<meta charset="UTF-8"><meta name="viewport" content="width=device-width">'
+            '<style>body{color:red}</style></head>'
+            '<body><h1 class="title" id="main">Title</h1></body></html>'
+        )
+
+        validator = Validator()
+        result = validator.verify_file(html_path)
+
+        assert result.success
+
+
+def test_validator_h1_with_inline_html():
+    """Test HTML validation passes when h1 contains inline HTML."""
+    with tempfile.TemporaryDirectory() as tmp:
+        html_path = Path(tmp) / "test.html"
+        html_path.write_text(
+            '<!DOCTYPE html><html><head><title>Test</title>'
+            '<meta charset="UTF-8"><meta name="viewport" content="width=device-width">'
+            '<style>body{color:red}</style></head>'
+            '<body><h1>Title <em>styled</em> text</h1></body></html>'
+        )
+
+        validator = Validator()
+        result = validator.verify_file(html_path)
+
+        assert result.success
+
+
+def test_publisher_cache_dedup():
+    """Test GitPublisher fingerprint deduplication."""
     import uuid
-    key = f"test-key-{uuid.uuid4().hex[:8]}"
+    from agent_publish.publisher import GitPublisher
     
-    is_dup, fp = check_duplicate(key, "content")
-    assert not is_dup
-    
-    save_fingerprint(key, fp)
-    
-    is_dup, fp2 = check_duplicate(key, "content")
-    assert is_dup
+    with tempfile.TemporaryDirectory() as tmp:
+        repo = Path(tmp) / "repo"
+        repo.mkdir()
+        (repo / ".git").mkdir()
+        (repo / "sketch").mkdir()
+        
+        # Create a dummy HTML file
+        html_path = repo / "sketch" / "test.html"
+        html_path.write_text("<html><body>test</body></html>")
+        
+        # Write a minimal git config so git commands don't fail
+        import subprocess
+        subprocess.run(
+            ["git", "-C", str(repo), "init"],
+            capture_output=True, text=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(repo), "config", "user.email", "test@test.com"],
+            capture_output=True, text=True,
+        )
+        subprocess.run(
+            ["git", "-C", str(repo), "config", "user.name", "Test"],
+            capture_output=True, text=True,
+        )
+        
+        publisher = GitPublisher(
+            repo_path=repo,
+            base_url="https://example.com",
+            content_dir="sketch",
+            auto_push=False,
+        )
+        
+        # First publish should succeed
+        result1 = publisher.publish(
+            html_path=html_path,
+            title="Test",
+            fingerprint="fp123",
+        )
+        assert result1.success
+        
+        # Second publish with same fingerprint should be cached
+        result2 = publisher.publish(
+            html_path=html_path,
+            title="Test",
+            fingerprint="fp123",
+        )
+        assert result2.success
+        assert "cached" in result2.message.lower()
+
+
+def test_cli_version_flag():
+    """Test --version flag returns version from pyproject.toml."""
+    import subprocess
+    result = subprocess.run(
+        ["python", "-m", "agent_publish.cli", "--version"],
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 0
+    assert "agent-publish" in result.stdout
 
 
 # ---- Config tests ----
@@ -307,7 +392,10 @@ if __name__ == "__main__":
     test_converter_custom_css_path()
     test_converter_template_override()
     test_validator()
-    test_state_dedup()
+    test_validator_h1_with_attributes()
+    test_validator_h1_with_inline_html()
+    test_publisher_cache_dedup()
+    test_cli_version_flag()
     test_load_config_toml()
     test_load_config_yaml()
     test_load_config_defaults_when_missing()

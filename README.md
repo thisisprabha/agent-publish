@@ -86,8 +86,7 @@ src/agent_publish/
 ├── config.py         # TOML/YAML config loader
 ├── themes.py         # Built-in CSS themes
 ├── assets.py         # Image resolution + copy
-├── validator.py      # Output verification
-└── state.py          # Fingerprint deduplication
+└── validator.py      # Output verification
 ```
 
 ## Eval

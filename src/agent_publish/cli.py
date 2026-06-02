@@ -1,6 +1,7 @@
 """CLI for agent-publish."""
 
 import argparse
+import importlib.metadata
 import sys
 from pathlib import Path
 
@@ -15,10 +16,34 @@ from .validator import Validator
 console = Console()
 
 
+def _get_version() -> str:
+    """Get version from installed package or pyproject.toml."""
+    try:
+        return importlib.metadata.version("agent-publish")
+    except importlib.metadata.PackageNotFoundError:
+        pass
+    # Fallback: read repo pyproject.toml
+    pyproject = Path(__file__).parent.parent.parent / "pyproject.toml"
+    if pyproject.exists():
+        try:
+            import toml
+            cfg = toml.load(pyproject)
+            return cfg["project"]["version"]
+        except Exception:
+            pass
+    return "unknown"
+
+
 def main():
+    version = _get_version()
     parser = argparse.ArgumentParser(
         description="Markdown-to-HTML pipeline for AI agents",
         prog="agent-publish",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {version}",
     )
     parser.add_argument(
         "input",

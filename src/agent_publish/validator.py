@@ -1,7 +1,8 @@
 """Validation and eval for agent-publish."""
 
-import re
+import html.parser
 import urllib.request
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
@@ -12,6 +13,21 @@ class VerificationResult:
     success: bool
     status: Optional[str]
     error: Optional[str]
+
+
+class _H1Parser(html.parser.HTMLParser):
+    """Simple HTML parser to detect presence of an <h1> tag."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.has_h1 = False
+
+    def handle_starttag(self, tag: str, attrs: list) -> None:
+        if tag.lower() == "h1":
+            self.has_h1 = True
+
+    def handle_endtag(self, tag: str) -> None:
+        pass
 
 
 class Validator:
@@ -29,7 +45,6 @@ class Validator:
             ("title", r"<title>[^<]+</title>"),
             ("charset", r'charset="UTF-8"'),
             ("viewport", r'content="width=device-width'),
-            ("h1", r"<h1>[^<]+</h1>"),
             ("style", r"<style>.*</style>", re.DOTALL),
         ]
         
@@ -41,6 +56,16 @@ class Validator:
                     status=None,
                     error=f"Missing: {name}",
                 )
+        
+        # Check h1 using proper HTML parser
+        h1_parser = _H1Parser()
+        h1_parser.feed(content)
+        if not h1_parser.has_h1:
+            return VerificationResult(
+                success=False,
+                status=None,
+                error="Missing: h1",
+            )
         
         # Check no external CSS deps
         if 'rel="stylesheet"' in content and 'href="http' in content:
