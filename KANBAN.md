@@ -58,8 +58,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ### Phase 3: Zero-token features
 
-- [ ] **AP-023**: Index page generator — `agent-publish index --output-dir ./dist` scans all published HTML files, extracts title/date/type from meta, generates a styled `index.html` listing all pages sorted by date. Use same theme as individual pages. | Est: 90min | Skills: python
-- [ ] **AP-024**: RSS/Atom feed — generate `feed.xml` alongside index page. Extract title, date, first paragraph as description. Standard RSS 2.0 format. Update on every publish. | Est: 60min | Skills: python
+- [x] **AP-023**: Index page generator — `agent-publish index --output-dir ./dist` scans all published HTML files, extracts title/date/type from meta, generates a styled `index.html` listing all pages sorted by date. Use same theme as individual pages. | Completed: 2026-06-03 | Skills: python
+- [x] **AP-024**: RSS/Atom feed — generate `feed.xml` alongside index page. Extract title, date, first paragraph as description. Standard RSS 2.0 format. Update on every publish. | Completed: 2026-06-03 | Skills: python
 - [ ] **AP-025**: Reading time + OG meta tags — calculate reading time (word count / 200 WPM), add to `.meta` line in template. Generate `<meta property="og:title/description/image">` from title + first paragraph. Add `--og-image` flag for custom social image. | Est: 45min | Skills: python, html
 - [ ] **AP-026**: `--watch` mode — local dev server with `http.server`, auto-rebuild on .md file change using `watchdog`. Serve on localhost:8080. Print URL on start. | Est: 60min | Skills: python
 - [ ] **AP-027**: `--init` command — scaffold `agent-publish.toml` config file in current directory with commented defaults. Interactive prompts for theme, output dir, git repo path. | Est: 30min | Skills: python
