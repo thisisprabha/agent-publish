@@ -566,6 +566,28 @@ def test_cli_site_title_flag():
     assert result.returncode != 0  # no subcommand = error
 
 
+def test_cli_template_flag():
+    """Test --template flag is accepted and used in publish command."""
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        md = Path(tmp) / "test.md"
+        md.write_text("# Template Flag\n\nContent.")
+        tpl = Path(tmp) / "my.html"
+        tpl.write_text(
+            '<!DOCTYPE html><html><head><title>{title}</title></head>'
+            '<body><h1>{title}</h1><div class="date">{date}</div>'
+            '<div class="fp">{fingerprint}</div><style>{css}</style>'
+            '<div class="body">{body}</div></body></html>'
+        )
+        result = subprocess.run(
+            ["python", "-m", "agent_publish.cli", "publish", str(md),
+             "--template", str(tpl), "--dry-run"],
+            capture_output=True, text=True,
+        )
+        assert result.returncode == 0, result.stderr
+        assert "Template Flag" in result.stdout
+
+
 # ---- AP-025: reading time + OG meta tags ----
 
 def test_reading_time_calculation():

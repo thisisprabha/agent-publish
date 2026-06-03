@@ -43,7 +43,7 @@ def _publish_cmd(args):
         cfg,
         theme=args.theme,
         custom_css_path=args.custom_css,
-        template_override=args.template,
+        template_override=args.template_override,
         base_url=args.url,
         repo_path=args.repo,
     )

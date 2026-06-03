@@ -58,7 +58,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
  ### Phase 2.5: CLI bug fix
 
-- [ ] **AP-040**: Fix CLI --template crash — cli.py line 46 uses `args.template` but argparse dest is `template_override`. Change to `args.template_override`. Add test that runs CLI with --template flag. | Est: 15min | Skills: python
+- [x] **AP-040**: Fix CLI --template crash — cli.py line 46 uses `args.template` but argparse dest is `template_override`. Change to `args.template_override`. Add test that runs CLI with --template flag. | Completed: 2026-06-04 | Skills: python
 
 ### Phase 3: Zero-token features
 
