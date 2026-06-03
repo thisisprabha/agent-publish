@@ -640,6 +640,84 @@ def test_description_extraction():
     assert desc == "First paragraph here."
 
 
+# ---- AP-026: watch mode tests ----
+
+def test_rebuild_file():
+    """Test _rebuild_file converts a .md and returns True on success."""
+    from agent_publish.watch import _rebuild_file
+    with tempfile.TemporaryDirectory() as tmp:
+        md = Path(tmp) / "hello.md"
+        md.write_text("# Hello\n\nWorld.")
+        out = Path(tmp) / "dist"
+        ok = _rebuild_file(md, out)
+        assert ok is True
+        assert (out / f"{__import__('datetime').datetime.now().strftime('%Y-%m-%d')}-hello.html").exists()
+
+
+def test_rebuild_file_failure():
+    """Test _rebuild_file returns False when input is invalid."""
+    from agent_publish.watch import _rebuild_file
+    with tempfile.TemporaryDirectory() as tmp:
+        bad = Path(tmp) / "bad.md"
+        bad.write_text("")  # no H1, but still convertible
+        out = Path(tmp) / "dist"
+        # Empty markdown IS convertible, so we need a truly bad path
+        ok = _rebuild_file(Path(tmp) / "does_not_exist.md", out)
+        assert ok is False
+
+
+def test_watch_server_initial_build():
+    """Test WatchServer builds existing .md files on startup."""
+    from agent_publish.watch import WatchServer
+    with tempfile.TemporaryDirectory() as tmp:
+        watch = Path(tmp) / "watch"
+        watch.mkdir()
+        out = Path(tmp) / "out"
+        md = watch / "note.md"
+        md.write_text("# Note\n\nText.")
+        hidden = watch / ".draft.md"
+        hidden.write_text("# Draft\n\nText.")
+        server = WatchServer(
+            watch_dir=watch,
+            output_dir=out,
+            theme="default",
+        )
+        server._initial_build()
+        # Only non-hidden files should be built
+        html_files = list(out.glob("*.html"))
+        assert len(html_files) == 1
+        assert "note" in html_files[0].name
+
+
+def test_watch_server_skip_hidden():
+    """Test _initial_build skips hidden .md files."""
+    from agent_publish.watch import WatchServer
+    with tempfile.TemporaryDirectory() as tmp:
+        watch = Path(tmp) / "watch"
+        watch.mkdir()
+        out = Path(tmp) / "out"
+        (watch / ".hidden.md").write_text("# Hidden\n\n.")
+        (watch / "visible.md").write_text("# Visible\n\n.")
+        server = WatchServer(watch_dir=watch, output_dir=out, theme="default")
+        server._initial_build()
+        names = {h.name for h in out.glob("*.html")}
+        assert any("visible" in n for n in names)
+        assert not any("hidden" in n for n in names)
+
+
+def test_cli_watch_command_help():
+    """Test --watch subcommand shows up in help."""
+    import subprocess
+    result = subprocess.run(
+        ["python", "-m", "agent_publish.cli", "watch", "--help"],
+        capture_output=True, text=True,
+    )
+    assert result.returncode == 0
+    assert "--port" in result.stdout
+    assert "--watch-dir" in result.stdout
+    assert "--output-dir" in result.stdout
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -675,4 +753,8 @@ if __name__ == "__main__":
     test_og_tags_generated()
     test_og_image_flag()
     test_description_extraction()
+    test_rebuild_file()
+    test_rebuild_file_failure()
+    test_watch_server_initial_build()
+    test_watch_server_skip_hidden()
     print("All tests passed!")

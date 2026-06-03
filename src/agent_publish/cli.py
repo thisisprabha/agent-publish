@@ -13,6 +13,7 @@ from .converter import convert_file
 from .index import generate_index_and_feed
 from .publisher import GitPublisher
 from .validator import Validator
+from .watch import WatchServer
 
 console = Console()
 
@@ -189,6 +190,42 @@ def _index_cmd(args):
         console.print(f"[dim]Dry-run:[/dim] {index_path} + {feed_path}")
 
 
+def _watch_cmd(args):
+    """Handle the watch subcommand."""
+    cfg = load_config(args.config)
+    cfg = merge_with_cli_args(
+        cfg,
+        theme=args.theme,
+        custom_css_path=args.custom_css,
+        template_override=args.template_override,
+        repo_path=args.repo,
+    )
+
+    repo_path = Path(cfg.github_repo_path) if cfg.github_repo_path else Path.cwd()
+    watch_dir = Path(args.watch_dir) if args.watch_dir else repo_path
+    output_dir = args.output_dir if args.output_dir else (repo_path / cfg.output_dir)
+
+    # Load theme CSS
+    from . import themes
+    if cfg.custom_css_path:
+        theme_css = themes.load("default", custom_path=cfg.custom_css_path)
+    else:
+        theme_css = themes.load(cfg.theme)
+
+    server = WatchServer(
+        watch_dir=watch_dir,
+        output_dir=output_dir,
+        port=args.port,
+        theme=cfg.theme,
+        custom_css=theme_css,
+        custom_css_path=cfg.custom_css_path,
+        template_override=cfg.template_override,
+        entry_type=args.type,
+        og_image=args.og_image,
+    )
+    server.start()
+
+
 def main():
     version = _get_version()
     parser = argparse.ArgumentParser(
@@ -302,6 +339,62 @@ def main():
         help="Site title for index + feed",
     )
     idx_parser.set_defaults(func=_index_cmd)
+
+    # ---- watch command ----
+    watch_parser = subparsers.add_parser("watch", help="Watch markdown files and serve on localhost")
+    watch_parser.add_argument(
+        "--watch-dir",
+        type=Path,
+        default=None,
+        help="Directory to watch for .md changes (default: current dir)",
+    )
+    watch_parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=None,
+        help="Directory for generated HTML (default: <repo>/sketch)",
+    )
+    watch_parser.add_argument(
+        "--repo",
+        type=Path,
+        help="Target repository path",
+    )
+    watch_parser.add_argument(
+        "--type",
+        default="daily",
+        choices=["daily", "weekly", "note", "research"],
+        help="Entry type",
+    )
+    watch_parser.add_argument(
+        "--port",
+        type=int,
+        default=8080,
+        help="Port for dev server",
+    )
+    watch_parser.add_argument(
+        "--theme",
+        choices=["default", "minimal", "brutalist"],
+        help="CSS theme",
+    )
+    watch_parser.add_argument(
+        "--custom-css",
+        type=Path,
+        dest="custom_css",
+        help="Path to custom CSS file",
+    )
+    watch_parser.add_argument(
+        "--template",
+        type=Path,
+        dest="template_override",
+        help="Path to custom HTML template file",
+    )
+    watch_parser.add_argument(
+        "--og-image",
+        default=None,
+        dest="og_image",
+        help="Open Graph image URL for social sharing",
+    )
+    watch_parser.set_defaults(func=_watch_cmd)
 
     args = parser.parse_args()
 
