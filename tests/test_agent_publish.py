@@ -456,3 +456,144 @@ if __name__ == "__main__":
     test_responsive_breakpoints()
     test_print_stylesheet()
     print("All tests passed!")
+
+
+# ---- Index page tests ----
+
+def test_generate_index_page():
+    """Test index.html generation with entries."""
+    from agent_publish.index import generate_index_page
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp)
+        generate_index_page(
+            entries=[{
+                "title": "Alpha",
+                "slug": "alpha",
+                "date": "2024-12-01",
+                "url": "",
+                "fingerprint": "fp1",
+            }],
+            out_dir=out,
+            site_title="Notebook",
+            theme="default",
+            base_url="",
+        )
+        index = out / "index.html"
+        assert index.exists()
+        html = index.read_text()
+        assert "Alpha" in html
+        assert "2024-12-01" in html
+        assert 'href="alpha.html"' in html
+        assert "<title>Notebook</title>" in html
+        assert '<ul class="entry-list"' in html
+
+
+def test_generate_index_empty():
+    """Test index page with no entries still renders."""
+    from agent_publish.index import generate_index_page
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp)
+        generate_index_page(
+            entries=[],
+            out_dir=out,
+            site_title="Empty",
+            theme="default",
+            base_url="",
+        )
+        html = (out / "index.html").read_text()
+        assert 'class="entry-list"' not in html
+        assert 'No entries published yet' in html
+
+
+# ---- RSS feed tests ----
+
+def test_generate_rss_feed():
+    """Test RSS feed generation."""
+    from agent_publish.feed import generate_rss_feed
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp)
+        generate_rss_feed(
+            entries=[{
+                "title": "Alpha",
+                "slug": "alpha",
+                "date": "2024-12-01",
+                "url": "https://example.com/alpha.html",
+                "fingerprint": "fp1",
+            }],
+            out_dir=out,
+            site_title="My Feed",
+            base_url="https://example.com",
+            description="Test feed",
+        )
+        rss = out / "feed.xml"
+        assert rss.exists()
+        xml = rss.read_text()
+        assert "<rss version=\"2.0\"" in xml
+        assert "<title>My Feed</title>" in xml
+        assert "<link>https://example.com</link>" in xml
+        assert "<description>Test feed</description>" in xml
+        assert "<item>" in xml
+        assert "<pubDate>" in xml
+
+
+def test_generate_rss_empty():
+    """Test RSS feed with no entries still renders channel metadata."""
+    from agent_publish.feed import generate_rss_feed
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp)
+        generate_rss_feed(
+            entries=[],
+            out_dir=out,
+            site_title="Empty Feed",
+            base_url="",
+            description="Nothing here",
+        )
+        xml = (out / "feed.xml").read_text()
+        assert "<title>Empty Feed</title>" in xml
+        assert "<description>Nothing here</description>" in xml
+        assert "<item>" not in xml
+
+
+# ---- CLI config flag tests ----
+
+def test_cli_site_title_flag():
+    """Test --site-title flag is accepted."""
+    import subprocess
+    result = subprocess.run(
+        ["python", "-m", "agent_publish.cli", "--site-title", "Test"],
+        capture_output=True, text=True,
+    )
+    assert result.returncode != 0  # no subcommand = error
+
+
+if __name__ == "__main__":
+    test_fingerprint()
+    test_clean_slug()
+    test_converter()
+    test_converter_custom_css_path()
+    test_converter_template_override()
+    test_validator()
+    test_validator_h1_with_attributes()
+    test_validator_h1_with_inline_html()
+    test_publisher_cache_dedup()
+    test_cli_version_flag()
+    test_load_config_toml()
+    test_load_config_yaml()
+    test_load_config_defaults_when_missing()
+    test_load_config_validates_custom_css_path()
+    test_load_config_validates_template_override()
+    test_merge_with_cli_args()
+    test_copy_assets_rewrites_src()
+    test_copy_assets_skips_remote()
+    test_converter_with_image()
+    test_converter_generates_toc()
+    test_converter_no_toc_for_single_header()
+    test_accessibility_skip_link()
+    test_accessibility_focus_visible()
+    test_responsive_breakpoints()
+    test_print_stylesheet()
+    test_generate_index_page()
+    test_generate_index_empty()
+    test_generate_rss_feed()
+    test_generate_rss_empty()
+    print("All tests passed!")

@@ -20,7 +20,10 @@ class Config:
     github_repo_path: str = "."
     github_auto_push: bool = True
     github_commit_prefix: str = "📦"
+    site_title: str = "Published Articles"
     validation_verify_reachable: bool = True
+    generate_index: bool = True
+    generate_feed: bool = True
 
 
 def _find_config_file() -> Optional[Path]:
@@ -85,7 +88,10 @@ def load_config(path: Optional[Path] = None) -> Config:
         github_repo_path=github.get("repo_path", "."),
         github_auto_push=github.get("auto_push", True),
         github_commit_prefix=github.get("commit_prefix", "📦"),
+        site_title=output.get("site_title", "Published Articles"),
         validation_verify_reachable=validation.get("verify_reachable", True),
+        generate_index=output.get("generate_index", True),
+        generate_feed=output.get("generate_feed", True),
     )
 
     if cfg.custom_css_path is not None and not cfg.custom_css_path.exists():
@@ -124,6 +130,9 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "repo_path": "github_repo_path",
         "auto_push": "github_auto_push",
         "commit_prefix": "github_commit_prefix",
+        "site_title": "site_title",
+        "generate_index": "generate_index",
+        "generate_feed": "generate_feed",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)

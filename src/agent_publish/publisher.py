@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
+from . import index as index_mod
+
 
 @dataclass
 class PublishResult:
@@ -26,12 +28,20 @@ class GitPublisher:
         content_dir: str = "sketch",
         auto_push: bool = True,
         commit_prefix: str = "📦",
+        theme_css: Optional[str] = None,
+        site_title: str = "Published Articles",
+        generate_index: bool = True,
+        generate_feed: bool = True,
     ):
         self.repo_path = Path(repo_path)
         self.base_url = base_url.rstrip('/')
         self.content_dir = content_dir
         self.auto_push = auto_push
         self.commit_prefix = commit_prefix
+        self.theme_css = theme_css
+        self.site_title = site_title
+        self._generate_index = generate_index
+        self._generate_feed = generate_feed
         self._fingerprint_file = self.repo_path / ".agent_publish_cache"
     
     def _load_cache(self) -> dict:
@@ -48,6 +58,23 @@ class GitPublisher:
         """Check if content already published."""
         cache = self._load_cache()
         return cache.get(output_name) == fingerprint
+    
+    def _generate_index_and_feed(self):
+        """Regenerate index.html and feed.xml after publish."""
+        if not self._generate_index and not self._generate_feed:
+            return
+        output_dir = self.repo_path / self.content_dir
+        if not output_dir.exists():
+            return
+        gen = index_mod.IndexGenerator(
+            output_dir=output_dir,
+            base_url=f"{self.base_url}/{self.content_dir}",
+            theme_css=self.theme_css,
+        )
+        if self._generate_index:
+            gen.generate_index(site_title=self.site_title)
+        if self._generate_feed:
+            gen.generate_feed(site_title=self.site_title, site_url=self.base_url)
     
     def publish(
         self,
@@ -138,6 +165,25 @@ class GitPublisher:
             cache = self._load_cache()
             cache[output_name] = fingerprint
             self._save_cache(cache)
+            
+            # Regenerate index + feed
+            if self._generate_index or self._generate_feed:
+                self._generate_index_and_feed()
+                # Re-commit if index/feed changed
+                subprocess.run(
+                    ["git", "-C", str(self.repo_path), "add", "."],
+                    check=True, capture_output=True, text=True,
+                )
+                # Re-commit if index changed
+                status2 = subprocess.run(
+                    ["git", "-C", str(self.repo_path), "status", "--porcelain"],
+                    check=True, capture_output=True, text=True,
+                )
+                if status2.stdout.strip():
+                    subprocess.run(
+                        ["git", "-C", str(self.repo_path), "commit", "-m", f"{self.commit_prefix} regenerate index + feed"],
+                        check=True, capture_output=True, text=True,
+                    )
             
             url = f"{self.base_url}/{self.content_dir}/{output_name}"
             return PublishResult(
