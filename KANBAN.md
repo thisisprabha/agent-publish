@@ -56,6 +56,10 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-021**: Responsive breakpoints — add `@media` queries for mobile (<640px) and tablet (<1024px) to all themes. Test: heading sizes, table horizontal scroll, code block overflow. | Completed: 2026-06-03 | Skills: css
 - [x] **AP-022**: Print stylesheet — add `@media print` to minimal and brutalist (default already has one). Hide nav, expand links, ensure clean page breaks. | Completed: 2026-06-03 | Skills: css
 
+- [ ] ### Phase 2.5: CLI bug fix
+
+- [ ] **AP-040**: Fix CLI --template crash — cli.py line 46 uses `args.template` but argparse dest is `template_override`. Change to `args.template_override`. Add test that runs CLI with --template flag. | Est: 15min | Skills: python
+
 ### Phase 3: Zero-token features
 
 - [x] **AP-023**: Index page generator — `agent-publish index --output-dir ./dist` scans all published HTML files, extracts title/date/type from meta, generates a styled `index.html` listing all pages sorted by date. Use same theme as individual pages. | Completed: 2026-06-03 | Skills: python
