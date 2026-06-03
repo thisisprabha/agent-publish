@@ -566,6 +566,58 @@ def test_cli_site_title_flag():
     assert result.returncode != 0  # no subcommand = error
 
 
+# ---- AP-025: reading time + OG meta tags ----
+
+def test_reading_time_calculation():
+    """Test reading time is based on word count at 200 WPM."""
+    from agent_publish.converter import _calculate_reading_time
+    assert _calculate_reading_time("# Short\n\nHello world.") == 1
+    four_hundred = "word " * 400
+    assert _calculate_reading_time(f"# Long\n\n{four_hundred}") >= 2
+
+
+def test_reading_time_present_in_meta():
+    """Test output HTML includes reading time."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "rt.md"
+        input_file.write_text("# Reading Time\n\nThis is some content for readers.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert "min read" in html
+
+
+def test_og_tags_generated():
+    """Test Open Graph meta tags are present."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "og.md"
+        input_file.write_text("# OG Test\n\nThis is a description paragraph.")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert 'property="og:title"' in html
+        assert 'property="og:description"' in html
+        assert 'property="og:type"' in html
+        assert 'name="description"' in html
+
+
+def test_og_image_flag():
+    """Test --og-image flag generates og:image meta tag."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "ogimg.md"
+        input_file.write_text("# OG Image\n\nContent here.")
+        result = convert_file(input_file, Path(tmp), "daily", og_image="https://example.com/img.png")
+        html = result.output_path.read_text()
+        assert 'property="og:image"' in html
+        assert "https://example.com/img.png" in html
+
+
+def test_description_extraction():
+    """Test first paragraph is extracted as description."""
+    from agent_publish.converter import _extract_description
+    html_body = "<p>First paragraph here.</p><p>Second paragraph.</p>"
+    desc = _extract_description(html_body)
+    assert desc == "First paragraph here."
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -596,4 +648,9 @@ if __name__ == "__main__":
     test_generate_index_empty()
     test_generate_rss_feed()
     test_generate_rss_empty()
+    test_reading_time_calculation()
+    test_reading_time_present_in_meta()
+    test_og_tags_generated()
+    test_og_image_flag()
+    test_description_extraction()
     print("All tests passed!")

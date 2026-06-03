@@ -79,6 +79,7 @@ def _publish_cmd(args):
                 custom_css=theme_css,
                 custom_css_path=cfg.custom_css_path,
                 template_override=cfg.template_override,
+                og_image=args.og_image,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -255,6 +256,12 @@ def main():
         "--eval",
         action="store_true",
         help="Run eval verification after publish",
+    )
+    pub_parser.add_argument(
+        "--og-image",
+        default=None,
+        dest="og_image",
+        help="Open Graph image URL for social sharing",
     )
     pub_parser.add_argument(
         "--site-title",

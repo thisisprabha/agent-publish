@@ -18,6 +18,8 @@ class ConversionResult:
     fingerprint: str
     output_path: Path
     assets_copied: List[Path] = field(default_factory=list)
+    reading_time: int = 1
+    description: Optional[str] = None
 
 
 def _generate_fingerprint(content: str) -> str:
@@ -39,6 +41,48 @@ def _safe_format(template: str, **kwargs) -> str:
     for key, value in kwargs.items():
         result = result.replace(f"{{{key}}}", str(value))
     return result
+
+
+def _calculate_reading_time(md_content: str) -> int:
+    """Calculate reading time in minutes at 200 WPM."""
+    # Strip code blocks
+    text = re.sub(r'```.*?```', '', md_content, flags=re.DOTALL)
+    # Strip inline code
+    text = re.sub(r'`[^`]*`', '', text)
+    # Strip images
+    text = re.sub(r'!\[.*?\]\(.*?\)', '', text)
+    # Strip links but keep text
+    text = re.sub(r'\[(.*?)\]\(.*?\)', r'\1', text)
+    # Strip remaining markdown syntax
+    text = re.sub(r'[#*_>`~]', '', text)
+    # Count words
+    words = len(text.split())
+    return max(1, round(words / 200))
+
+
+def _extract_description(html_body: str) -> str:
+    """Extract first paragraph text as plain string for OG description."""
+    match = re.search(r'<p>(.*?)</p>', html_body, re.DOTALL)
+    if match:
+        text = re.sub(r'<[^>]+>', '', match.group(1))
+        text = ' '.join(text.split())
+        return text
+    return ""
+
+
+def _build_og_tags(title: str, description: str, og_image: Optional[str] = None) -> str:
+    """Build Open Graph meta tags."""
+    esc = description.replace('"', '&quot;')
+    t_esc = title.replace('"', '&quot;')
+    lines = [
+        f'<meta name="description" content="{esc}">',
+        '<meta property="og:type" content="article">',
+        f'<meta property="og:title" content="{t_esc}">',
+        f'<meta property="og:description" content="{esc}">',
+    ]
+    if og_image:
+        lines.append(f'<meta property="og:image" content="{og_image}">')
+    return "\n".join(lines)
 
 
 def _clean_slug(title: str) -> str:
@@ -65,6 +109,7 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
+{og_tags}
 <style>
 {css}
 </style>
@@ -75,7 +120,7 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 
 <header>
   <h1>{title}</h1>
-  <p class="meta">{entry_type} &middot; {date} &middot; <code>{fingerprint}</code></p>
+  <p class="meta">{entry_type} &middot; {date} &middot; {reading_time} min read &middot; <code>{fingerprint}</code></p>
 </header>
 
 <main class="main" id="main-content">
@@ -93,6 +138,7 @@ def convert_file(
     custom_css_path: Optional[Path] = None,
     template_override: Optional[Path] = None,
     date_str: Optional[str] = None,
+    og_image: Optional[str] = None,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -104,6 +150,7 @@ def convert_file(
         custom_css_path: Optional path to custom CSS file (takes precedence over custom_css)
         template_override: Optional path to template file with {title}, {css}, {fingerprint}, {date}, {body}, {entry_type} placeholders
         date_str: Optional date string (defaults to today)
+        og_image: Optional URL for Open Graph image
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -152,6 +199,11 @@ def convert_file(
     else:
         template = DEFAULT_TEMPLATE
 
+    # Compute reading time and description
+    reading_time = _calculate_reading_time(md_content)
+    description = _extract_description(html_body)
+    og_tags = _build_og_tags(title, description, og_image)
+
     html = _safe_format(
         template,
         title=title,
@@ -160,6 +212,8 @@ def convert_file(
         date=date,
         body=html_body,
         entry_type=entry_type.capitalize(),
+        reading_time=reading_time,
+        og_tags=og_tags,
     )
 
     from agent_publish.assets import copy_assets
@@ -177,4 +231,6 @@ def convert_file(
         fingerprint=fingerprint,
         output_path=output_path,
         assets_copied=assets_copied,
+        reading_time=reading_time,
+        description=description,
     )
