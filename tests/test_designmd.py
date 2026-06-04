@@ -195,4 +195,52 @@ def test_designmd_file_load(tmp_path: Path):
     """Load DESIGN.md from a real file path."""
     d = designmd.load_design(_write_design(tmp_path, MINIMAL_TEXT))
     assert d.name == "Minimal"
-    assert d.sections.get("visual theme \u0026 atmosphere", "") == "Pure utility."
+    assert d.sections.get("visual theme & atmosphere", "") == "Pure utility."
+
+
+# ── CLI --theme-design integration tests ──
+
+def test_cli_theme_design_flag_parsed_by_config(tmp_path: Path):
+    """theme_design_path from CLI merges correctly into config."""
+    from agent_publish.config import Config, merge_with_cli_args
+    design_file = tmp_path / "design.md"
+    design_file.write_text("---\n---\n")
+    cfg = Config(github_repo_path="/tmp/repo")
+    result = merge_with_cli_args(cfg, theme_design_path=str(design_file))
+    assert result.theme_design_path == design_file
+
+
+def test_cli_theme_design_file_must_exist():
+    """Non-existent theme_design_path raises FileNotFoundError."""
+    from agent_publish.config import Config, merge_with_cli_args
+    cfg = Config(github_repo_path="/tmp/repo")
+    with pytest.raises(FileNotFoundError):
+        merge_with_cli_args(cfg, theme_design_path="/tmp/nonexistent.md")
+
+
+def test_themes_load_with_design_path(tmp_path: Path):
+    """themes.load('default', design_path=...) injects DESIGN.md CSS."""
+    design_file = _write_design(tmp_path, FULL_TEXT)
+    css = load("default", design_path=design_file)
+    assert "#faf8f5" in css or "#1c1917" in css
+
+
+def test_themes_load_design_path_priority_over_custom_path(tmp_path: Path):
+    """design_path overrides custom_path when both given."""
+    design_file = _write_design(tmp_path, FULL_TEXT)
+    custom_css = tmp_path / "custom.css"
+    custom_css.write_text("body{ color: pink }")
+    css = load("default", design_path=design_file, custom_path=custom_css)
+    assert "#faf8f5" in css or "#1c1917" in css
+    assert "pink" not in css
+
+
+def test_cli_help_shows_theme_design_flag():
+    """Ensure --theme-design appears in CLI help output."""
+    import subprocess, sys
+    result = subprocess.run(
+        [sys.executable, "-m", "agent_publish.cli", "publish", "--help"],
+        capture_output=True,
+        text=True,
+    )
+    assert "--theme-design" in result.stdout

@@ -15,6 +15,7 @@ class Config:
     output_dir: str = "sketch"
     theme: str = "default"
     custom_css_path: Optional[Path] = None
+    theme_design_path: Optional[Path] = None
     template_override: Optional[Path] = None
     base_url: str = ""
     github_repo_path: str = "."
@@ -86,6 +87,7 @@ def load_config(path: Optional[Path] = None) -> Config:
         output_dir=output.get("content_dir", "sketch"),
         theme=output.get("theme", "default"),
         custom_css_path=_resolve_path(output.get("custom_css_path"), cfg_dir),
+        theme_design_path=_resolve_path(output.get("theme_design_path"), cfg_dir),
         template_override=_resolve_path(output.get("template_override"), cfg_dir),
         base_url=output.get("base_url", ""),
         github_repo_path=github.get("repo_path", "."),
@@ -102,6 +104,8 @@ def load_config(path: Optional[Path] = None) -> Config:
 
     if cfg.favicon is not None and not cfg.favicon.exists():
         raise FileNotFoundError(f"favicon not found: {cfg.favicon}")
+    if cfg.theme_design_path is not None and not cfg.theme_design_path.exists():
+        raise FileNotFoundError(f"theme_design_path not found: {cfg.theme_design_path}")
     if cfg.custom_css_path is not None and not cfg.custom_css_path.exists():
         raise FileNotFoundError(f"custom_css_path not found: {cfg.custom_css_path}")
     if cfg.template_override is not None and not cfg.template_override.exists():
@@ -133,6 +137,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
     field_map = {
         "theme": "theme",
         "custom_css_path": "custom_css_path",
+        "theme_design_path": "theme_design_path",
         "template_override": "template_override",
         "base_url": "base_url",
         "repo_path": "github_repo_path",
@@ -157,6 +162,11 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
             if not p.exists():
                 raise FileNotFoundError(f"custom_css_path not found: {p}")
             kwargs["custom_css_path"] = p
+        if "theme_design_path" in kwargs:
+            p = Path(kwargs["theme_design_path"]).expanduser().resolve()
+            if not p.exists():
+                raise FileNotFoundError(f"theme_design_path not found: {p}")
+            kwargs["theme_design_path"] = p
         if "template_override" in kwargs:
             p = Path(kwargs["template_override"]).expanduser().resolve()
             if not p.exists():

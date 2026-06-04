@@ -185,20 +185,39 @@ def _package_themes_dir() -> Path:
     return Path(__file__).parent / "design_themes"
 
 
-def load(theme: str, custom_path: Optional[Path] = None) -> str:
+def load(theme: str, custom_path: Optional[Path] = None, design_path: Optional[Path] = None) -> str:
     """Load CSS theme.
 
     Args:
         theme: Theme name (default, minimal, brutalist) or 'custom' with
             custom_path.
         custom_path: Path to custom CSS file.
+        design_path: Path to a DESIGN.md file to generate CSS from.
 
     Returns:
         CSS string.
     """
+    if design_path:
+        from . import designmd
+        parsed = designmd.load_design(design_path)
+        return designmd.generate_css(parsed)
     if custom_path:
         return custom_path.read_text(encoding='utf-8')
     return THEMES.get(theme, DEFAULT_CSS)
+
+
+def load_design_theme(design_path: Path) -> str:
+    """Load CSS from a DESIGN.md file.
+
+    Args:
+        design_path: Path to a DESIGN.md file.
+
+    Returns:
+        CSS string generated from the DESIGN.md spec.
+    """
+    from . import designmd
+    parsed = designmd.load_design(design_path)
+    return designmd.generate_css(parsed)
 
 
 def list_themes() -> list:

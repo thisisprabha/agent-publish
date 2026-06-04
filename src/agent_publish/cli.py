@@ -44,6 +44,7 @@ def _publish_cmd(args):
         cfg,
         theme=args.theme,
         custom_css_path=args.custom_css,
+        theme_design_path=args.theme_design,
         template_override=args.template_override,
         base_url=args.url,
         repo_path=args.repo,
@@ -59,9 +60,11 @@ def _publish_cmd(args):
         console.print("[red]Error: --url or output.base_url in config required[/red]")
         sys.exit(1)
 
-    # Load theme CSS unless custom_css_path is provided
+    # Load theme CSS
     from . import themes
-    if cfg.custom_css_path:
+    if cfg.theme_design_path:
+        theme_css = themes.load("default", design_path=cfg.theme_design_path)
+    elif cfg.custom_css_path:
         theme_css = themes.load("default", custom_path=cfg.custom_css_path)
     else:
         theme_css = themes.load(cfg.theme)
@@ -410,6 +413,12 @@ def main():
         type=Path,
         dest="custom_css",
         help="Path to custom CSS file",
+    )
+    pub_parser.add_argument(
+        "--theme-design",
+        type=Path,
+        dest="theme_design",
+        help="Path to a DESIGN.md file to generate CSS from",
     )
     pub_parser.add_argument(
         "--template",

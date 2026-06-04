@@ -37,7 +37,7 @@
 | AP-033 | — | — | — | (reserved) |
 | AP-034 | — | — | — | (reserved) |
 | AP-035 | — | — | — | (reserved) |
-| AP-036 | CLI wiring for DESIGN.md `--theme-design` flag | 🔄 In Progress | Day 10 | Hook `--theme-design` into `publish`, `index` commands |
+| AP-036 | CLI wiring for DESIGN.md `--theme-design` flag | ✅ Done | Day 10 | 73 tests passing, design_path in config/themes/cli |
 | AP-037 | — | — | — | (reserved) |
 | AP-038 | — | — | — | (reserved) |
 | AP-039 | — | — | — | (reserved) |
