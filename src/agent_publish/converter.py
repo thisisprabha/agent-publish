@@ -11,6 +11,9 @@ from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions import fenced_code, tables, toc
 
 
+_FENCE_RE = re.compile(r'^```mermaid\s*\n(.*?)\n?^```', re.MULTILINE | re.DOTALL)
+
+
 @dataclass
 class ConversionResult:
     html: str
@@ -85,9 +88,57 @@ def _build_og_tags(title: str, description: str, og_image: Optional[str] = None)
     return "\n".join(lines)
 
 
+def _unwrap_mermaid(html: str) -> str:
+    """Convert any highlighted mermaid blocks to raw <pre class='mermaid'>."""
+    # match <div class="codehilite">...</div> when inner code references mermaid
+    pattern = re.compile(
+        r'<div\s+class="codehilite"\s*>(?P<inner>.*?)</div>',
+        re.DOTALL,
+    )
+
+    def mermaid_div_repl(m: re.Match) -> str:
+        inner = m.group('inner')
+        if 'language-mermaid' not in inner and 'class="mermaid"' not in inner:
+            return m.group(0)
+        raw = re.sub(r'<[^>]+>', '', inner)
+        raw = raw.strip()
+        if not raw:
+            return m.group(0)
+        return f'<pre class="mermaid">{raw}</pre>'
+
+    html = pattern.sub(mermaid_div_repl, html)
+
+    # Also handle <pre><code class="language-mermaid"> outside div.codehilite
+    pre_code_pattern = re.compile(
+        r'<pre>\s*<code(?:\s+class="[^"]*\blanguage-mermaid\b[^"]*")?\s*>'
+        r'(.*?)'
+        r'</code>\s*</pre>',
+        re.DOTALL,
+    )
+
+    def pre_code_repl(m: re.Match) -> str:
+        raw = m.group(1).strip()
+        return f'<pre class="mermaid">{raw}</pre>'
+
+    html = pre_code_pattern.sub(pre_code_repl, html)
+    return html
+
+
+def _inject_mermaid(html: str) -> str:
+    """Inject Mermaid.js CDN and initialize script before </body>."""
+    scripts = (
+        '\n<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>\n'
+        '<script>mermaid.initialize({startOnLoad:true, theme: "default"});</script>\n'
+    )
+    if "</body>" in html:
+        html = html.replace("</body>", f"{scripts}</body>")
+    else:
+        html = html + scripts + "\n"
+    return html
+
+
 def _clean_slug(title: str) -> str:
     """Generate URL-safe slug from title."""
-    # Strip common prefixes
     cleaned = re.sub(
         r'^(Cron Job:|Research Report:|Daily:|Weekly:)\s*',
         '', title, flags=re.IGNORECASE,
@@ -96,7 +147,6 @@ def _clean_slug(title: str) -> str:
         r'^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}\s*[-:]\s*',
         '', cleaned,
     )
-    # Clean special chars
     slug = re.sub(r'[^a-zA-Z0-9\s-]', ' ', cleaned.strip())
     slug = re.sub(r'\s+', '-', slug)
     slug = re.sub(r'-+', '-', slug).strip('-').lower()[:60]
@@ -139,6 +189,7 @@ def convert_file(
     template_override: Optional[Path] = None,
     date_str: Optional[str] = None,
     og_image: Optional[str] = None,
+    mermaid: bool = True,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -151,6 +202,7 @@ def convert_file(
         template_override: Optional path to template file with {title}, {css}, {fingerprint}, {date}, {body}, {entry_type} placeholders
         date_str: Optional date string (defaults to today)
         og_image: Optional URL for Open Graph image
+        mermaid: Whether to enable Mermaid diagram support (default True)
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -164,6 +216,15 @@ def convert_file(
     title = _extract_title(md_content)
     fingerprint = _generate_fingerprint(md_content)
 
+    # Pre-extract mermaid blocks so they bypass syntax highlighting
+    mermaid_blocks: List[str] = []
+    if mermaid:
+        def _mermaid_repl(match: re.Match) -> str:
+            idx = len(mermaid_blocks)
+            mermaid_blocks.append(match.group(1).rstrip('\n'))
+            return f'\n<!-- MERMAID_BLOCK_{idx} -->\n'
+        md_content = _FENCE_RE.sub(_mermaid_repl, md_content)
+
     # Parse markdown with syntax highlighting
     md = markdown.Markdown(extensions=[
         fenced_code.FencedCodeExtension(),
@@ -174,6 +235,19 @@ def convert_file(
 
     html_body = md.convert(md_content)
     toc_html = md.toc if hasattr(md, 'toc') else ""  # type: ignore[attr-defined]
+
+    # Re-insert mermaid blocks as raw <pre class="mermaid">
+    if mermaid and mermaid_blocks:
+        for idx, block in enumerate(mermaid_blocks):
+            placeholder = f'<!-- MERMAID_BLOCK_{idx} -->'
+            html_body = html_body.replace(
+                placeholder,
+                f'<pre class="mermaid">{block}</pre>',
+            )
+
+    # Fallback: strip any remaining highlighted mermaid wrappers in HTML
+    if mermaid:
+        html_body = _unwrap_mermaid(html_body)
 
     # If TOC has at least 2 entries (meaningful nav), wrap and prepend
     if toc_html and toc_html.count('<a href="#') >= 2:
@@ -215,6 +289,10 @@ def convert_file(
         reading_time=reading_time,
         og_tags=og_tags,
     )
+
+    # Inject Mermaid.js if mermaid blocks are present and mermaid is enabled
+    if mermaid and '<pre class="mermaid">' in html_body:
+        html = _inject_mermaid(html)
 
     from agent_publish.assets import copy_assets
 

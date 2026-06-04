@@ -429,6 +429,54 @@ def test_print_stylesheet():
         assert '.skip-link{display:none}' in html
 
 
+def test_mermaid_block_renders():
+    """Test that mermaid code blocks appear as <pre class='mermaid'>."""
+    from agent_publish.converter import convert_file
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "mermaid.md"
+        input_file.write_text(
+            "# Diagram\n\n```mermaid\ngraph TD;\n  A-->B;\n```\n\nDone.\n"
+        )
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert '<pre class="mermaid">graph TD;' in html
+        assert "</code>" not in html.split('<pre class="mermaid">')[1].split("</pre>")[0]
+
+
+def test_mermaid_script_injected_when_present():
+    """Test that Mermaid.js CDN script is injected when mermaid blocks present."""
+    from agent_publish.converter import convert_file
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "mermaid.md"
+        input_file.write_text(
+            "# Diagram\n\n```mermaid\nflowchart LR\n  Hello --> World\n```\n"
+        )
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert "mermaid@11/dist/mermaid.min.js" in html
+        assert 'mermaid.initialize({startOnLoad:true, theme: "default"})' in html
+
+
+def test_mermaid_script_not_injected_when_absent():
+    """Test that Mermaid.js CDN script is NOT injected when no mermaid blocks."""
+    from agent_publish.converter import convert_file
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "plain.md"
+        input_file.write_text("# Hello\n\nJust plain text.\n")
+        result = convert_file(input_file, Path(tmp), "daily")
+        html = result.output_path.read_text()
+        assert "mermaid.min.js" not in html
+        assert "mermaid.initialize" not in html
+
+
+def test_cli_no_mermaid_flag():
+    """Test --no-mermaid flag suppresses injection."""
+    from agent_publish.config import Config, merge_with_cli_args
+    cfg = Config(mermaid=True)
+    merged = merge_with_cli_args(cfg, mermaid=False)
+    assert merged.mermaid is False
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -455,6 +503,10 @@ if __name__ == "__main__":
     test_accessibility_focus_visible()
     test_responsive_breakpoints()
     test_print_stylesheet()
+    test_mermaid_block_renders()
+    test_mermaid_script_injected_when_present()
+    test_mermaid_script_not_injected_when_absent()
+    test_cli_no_mermaid_flag()
     print("All tests passed!")
 
 
@@ -718,6 +770,62 @@ def test_cli_watch_command_help():
     assert "--output-dir" in result.stdout
 
 
+# ---- AP-027: init subcommand tests ----
+
+def test_init_creates_default_file():
+    """Test init creates agent-publish.toml with commented defaults when non-interactive."""
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        result = subprocess.run(
+            ["python", "-m", "agent_publish.cli", "init"],
+            capture_output=True, text=True, cwd=tmp,
+        )
+        assert result.returncode == 0, result.stderr
+        cfg_path = Path(tmp) / "agent-publish.toml"
+        assert cfg_path.exists()
+        text = cfg_path.read_text()
+        assert "[output]" in text
+        assert "[github]" in text
+        assert "[validation]" in text
+        # Non-interactive defaults should be commented out
+        assert '# theme = "default"' in text
+        assert '# content_dir = "sketch"' in text
+        assert '# site_title = "Published Articles"' in text
+        assert '# repo_path = "."' in text
+        assert "# favicon =" in text
+        assert "Created configuration template" in result.stdout
+
+
+def test_init_respects_config_path():
+    """Test init --config writes to the specified path."""
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        custom = Path(tmp) / "nested" / "custom.toml"
+        result = subprocess.run(
+            ["python", "-m", "agent_publish.cli", "init", "--config", str(custom)],
+            capture_output=True, text=True, cwd=tmp,
+        )
+        assert result.returncode == 0, result.stderr
+        assert custom.exists()
+        assert "[output]" in custom.read_text()
+
+
+def test_init_refuses_overwrite():
+    """Test init exits 1 when file exists and not in interactive TTY."""
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "agent-publish.toml"
+        cfg_path.write_text("# existing\n")
+        result = subprocess.run(
+            ["python", "-m", "agent_publish.cli", "init"],
+            capture_output=True, text=True, cwd=tmp,
+        )
+        assert result.returncode == 1, result.stderr
+        # File should remain unchanged
+        assert cfg_path.read_text() == "# existing\n"
+        assert "already exists" in result.stdout
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -757,4 +865,11 @@ if __name__ == "__main__":
     test_rebuild_file_failure()
     test_watch_server_initial_build()
     test_watch_server_skip_hidden()
+    test_mermaid_block_renders()
+    test_mermaid_script_injected_when_present()
+    test_mermaid_script_not_injected_when_absent()
+    test_cli_no_mermaid_flag()
+    test_init_creates_default_file()
+    test_init_respects_config_path()
+    test_init_refuses_overwrite()
     print("All tests passed!")

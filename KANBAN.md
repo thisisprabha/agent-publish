@@ -66,8 +66,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-024**: RSS/Atom feed — generate `feed.xml` alongside index page. Extract title, date, first paragraph as description. Standard RSS 2.0 format. Update on every publish. | Completed: 2026-06-03 | Skills: python
 - [x] **AP-025**: Reading time + OG meta tags — calculate reading time (word count / 200 WPM), add to `.meta` line in template. Generate `<meta property="og:title/description/image">` from title + first paragraph. Add `--og-image` flag for custom social image. | Completed: 2026-06-03 | Skills: python, html
 - [x] **AP-026**: `--watch` mode — local dev server with `http.server`, auto-rebuild on .md file change using `watchdog`. Serve on localhost:8080. Print URL on start. | Completed: 2026-06-04 | Skills: python
-- [ ] **AP-027**: `--init` command — scaffold `agent-publish.toml` config file in current directory with commented defaults. Interactive prompts for theme, output dir, git repo path. | Est: 30min | Skills: python
-- [ ] **AP-028**: Mermaid diagram support — detect ` ```mermaid` fenced blocks, inject mermaid.js CDN script (only when mermaid blocks exist), render client-side. Zero tokens. | Est: 45min | Skills: python, js
+- [x] **AP-027**: `--init` command — scaffold `agent-publish.toml` config file in current directory with commented defaults. Interactive prompts for theme, output dir, git repo path. | Completed: 2026-06-04 | Skills: python
+- [x] **AP-028**: Mermaid diagram support — detect ` ```mermaid` fenced blocks, inject mermaid.js CDN script (only when mermaid blocks exist), render client-side. Zero tokens. | Completed: 2026-06-04 | Skills: python, js
 - [ ] **AP-029**: Favicon + site metadata — add favicon support via config (`favicon = "path/to/icon.png"`), generate `<link rel=icon>`. Add site title/author config for consistent headers. | Est: 30min | Skills: python, html
 
 ### Phase 4: Architecture upgrades (inspired by open-design)

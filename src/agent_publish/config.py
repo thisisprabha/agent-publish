@@ -24,6 +24,7 @@ class Config:
     validation_verify_reachable: bool = True
     generate_index: bool = True
     generate_feed: bool = True
+    mermaid: bool = True
 
 
 def _find_config_file() -> Optional[Path]:
@@ -92,6 +93,7 @@ def load_config(path: Optional[Path] = None) -> Config:
         validation_verify_reachable=validation.get("verify_reachable", True),
         generate_index=output.get("generate_index", True),
         generate_feed=output.get("generate_feed", True),
+        mermaid=output.get("mermaid", True),
     )
 
     if cfg.custom_css_path is not None and not cfg.custom_css_path.exists():
@@ -133,6 +135,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "site_title": "site_title",
         "generate_index": "generate_index",
         "generate_feed": "generate_feed",
+        "mermaid": "mermaid",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)
