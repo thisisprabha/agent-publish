@@ -826,6 +826,77 @@ def test_init_refuses_overwrite():
         assert "already exists" in result.stdout
 
 
+def test_converter_favicon_and_author():
+    """Test favicon copy and author meta tag generation."""
+    with tempfile.TemporaryDirectory() as tmp:
+        input_file = Path(tmp) / "test.md"
+        input_file.write_text("# Favicon Test\n\nSome content here.")
+        favicon_file = Path(tmp) / "favicon.ico"
+        favicon_file.write_bytes(b"fake-icon-data")
+
+        result = convert_file(
+            input_file, Path(tmp), "daily",
+            favicon=favicon_file,
+            author="Alice",
+        )
+        html = result.output_path.read_text()
+
+        # Favicon link tag present
+        assert '<link rel="icon"' in html
+        assert 'href="favicon.ico"' in html
+
+        # Favicon copied to output
+        copied = Path(tmp) / "favicon.ico"
+        assert copied.exists()
+        assert copied.read_bytes() == b"fake-icon-data"
+
+
+def test_load_config_favicon_and_author():
+    """Test config parsing for favicon and author fields."""
+    import toml
+    from agent_publish.config import load_config
+
+    with tempfile.TemporaryDirectory() as tmp:
+        cfg_path = Path(tmp) / "agent-publish.toml"
+        favicon = Path(tmp) / "icon.png"
+        favicon.write_bytes(b"x")
+        cfg_path.write_text(
+            f"""[output]
+theme = "minimal"
+favicon = "{favicon}"
+author = "Bob"
+site_title = "Bob's Blog"
+"""
+        )
+        cfg = load_config(cfg_path)
+        assert cfg.theme == "minimal"
+        assert cfg.favicon == favicon.resolve()
+        assert cfg.author == "Bob"
+        assert cfg.site_title == "Bob's Blog"
+
+
+def test_cli_favicon_flag():
+    """Test CLI --favicon and --author flags reach the converter."""
+    import subprocess
+    with tempfile.TemporaryDirectory() as tmp:
+        md = Path(tmp) / "page.md"
+        md.write_text("# Flag Test\n\nBody.")
+        favicon = Path(tmp) / "fav.png"
+        favicon.write_bytes(b"x")
+        # Just ensure the CLI parses --favicon and --author without error
+        result = subprocess.run(
+            [
+                "python", "-m", "agent_publish.cli",
+                "publish", str(md),
+                "--dry-run",
+                "--favicon", str(favicon),
+                "--author", "Charlie",
+            ],
+            capture_output=True, text=True, cwd=tmp,
+        )
+        assert result.returncode == 0, result.stderr
+
+
 if __name__ == "__main__":
     test_fingerprint()
     test_clean_slug()
@@ -872,4 +943,7 @@ if __name__ == "__main__":
     test_init_creates_default_file()
     test_init_respects_config_path()
     test_init_refuses_overwrite()
+    test_converter_favicon_and_author()
+    test_load_config_favicon_and_author()
+    test_cli_favicon_flag()
     print("All tests passed!")

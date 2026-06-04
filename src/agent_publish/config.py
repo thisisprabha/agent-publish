@@ -25,6 +25,8 @@ class Config:
     generate_index: bool = True
     generate_feed: bool = True
     mermaid: bool = True
+    favicon: Optional[Path] = None
+    author: str = ""
 
 
 def _find_config_file() -> Optional[Path]:
@@ -94,8 +96,12 @@ def load_config(path: Optional[Path] = None) -> Config:
         generate_index=output.get("generate_index", True),
         generate_feed=output.get("generate_feed", True),
         mermaid=output.get("mermaid", True),
+        favicon=_resolve_path(output.get("favicon"), cfg_dir),
+        author=output.get("author", ""),
     )
 
+    if cfg.favicon is not None and not cfg.favicon.exists():
+        raise FileNotFoundError(f"favicon not found: {cfg.favicon}")
     if cfg.custom_css_path is not None and not cfg.custom_css_path.exists():
         raise FileNotFoundError(f"custom_css_path not found: {cfg.custom_css_path}")
     if cfg.template_override is not None and not cfg.template_override.exists():
@@ -136,6 +142,8 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "generate_index": "generate_index",
         "generate_feed": "generate_feed",
         "mermaid": "mermaid",
+        "favicon": "favicon",
+        "author": "author",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)
@@ -154,6 +162,11 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
             if not p.exists():
                 raise FileNotFoundError(f"template_override not found: {p}")
             kwargs["template_override"] = p
+        if "favicon" in kwargs:
+            p = Path(kwargs["favicon"]).expanduser().resolve()
+            if not p.exists():
+                raise FileNotFoundError(f"favicon not found: {p}")
+            kwargs["favicon"] = p
         return cfg.__class__(**{**cfg.__dict__, **kwargs})
 
     return cfg

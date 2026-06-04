@@ -48,6 +48,8 @@ def _publish_cmd(args):
         base_url=args.url,
         repo_path=args.repo,
         mermaid=not args.no_mermaid,
+        favicon=args.favicon,
+        author=args.author,
     )
 
     repo_path = Path(cfg.github_repo_path)
@@ -83,6 +85,8 @@ def _publish_cmd(args):
                 template_override=cfg.template_override,
                 og_image=args.og_image,
                 mermaid=cfg.mermaid,
+                favicon=cfg.favicon,
+                author=cfg.author,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -443,6 +447,17 @@ def main():
         "--no-mermaid",
         action="store_true",
         help="Skip Mermaid diagram processing",
+    )
+    pub_parser.add_argument(
+        "--favicon",
+        type=Path,
+        default=None,
+        help="Path to favicon image (copied to output and linked in HTML)",
+    )
+    pub_parser.add_argument(
+        "--author",
+        default=None,
+        help="Author name for site metadata",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 

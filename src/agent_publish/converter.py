@@ -160,6 +160,7 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{title}</title>
 {og_tags}
+{favicon_tag}
 <style>
 {css}
 </style>
@@ -190,6 +191,8 @@ def convert_file(
     date_str: Optional[str] = None,
     og_image: Optional[str] = None,
     mermaid: bool = True,
+    favicon: Optional[Path] = None,
+    author: Optional[str] = None,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -203,6 +206,8 @@ def convert_file(
         date_str: Optional date string (defaults to today)
         og_image: Optional URL for Open Graph image
         mermaid: Whether to enable Mermaid diagram support (default True)
+        favicon: Optional path to favicon image (copied to output and linked)
+        author: Optional author name for site metadata
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -278,6 +283,11 @@ def convert_file(
     description = _extract_description(html_body)
     og_tags = _build_og_tags(title, description, og_image)
 
+    # Build favicon tag
+    favicon_tag = ""
+    if favicon and favicon.exists():
+        favicon_tag = f'<link rel="icon" type="image/x-icon" href="{favicon.name}">'
+
     html = _safe_format(
         template,
         title=title,
@@ -288,6 +298,7 @@ def convert_file(
         entry_type=entry_type.capitalize(),
         reading_time=reading_time,
         og_tags=og_tags,
+        favicon_tag=favicon_tag,
     )
 
     # Inject Mermaid.js if mermaid blocks are present and mermaid is enabled
@@ -297,6 +308,18 @@ def convert_file(
     from agent_publish.assets import copy_assets
 
     html, assets_copied = copy_assets(html, base_dir=input_path.parent, output_dir=output_dir)
+
+    # Copy favicon to output if provided
+    if favicon and favicon.exists():
+        import shutil
+        dest_favicon = output_dir / favicon.name
+        if favicon.resolve() != dest_favicon.resolve():
+            shutil.copy2(favicon, dest_favicon)
+            assets_copied.insert(0, dest_favicon)
+        else:
+            # Already in output dir — ensure it's tracked
+            if dest_favicon not in assets_copied:
+                assets_copied.insert(0, dest_favicon)
 
     output_name = f"{date}-{slug}.html"
     output_path = output_dir / output_name
