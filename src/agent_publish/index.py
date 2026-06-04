@@ -1,8 +1,11 @@
 """Generate index.html and feed.xml for published entries."""
 
+from __future__ import annotations
+
 import re
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from . import feed as feed_mod
 from .themes import THEMES

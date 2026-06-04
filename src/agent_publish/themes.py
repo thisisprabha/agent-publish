@@ -180,19 +180,24 @@ THEMES = {
 }
 
 
+def _package_themes_dir() -> Path:
+    """Return the directory containing builtin DESIGN.md theme folders."""
+    return Path(__file__).parent / "design_themes"
+
+
 def load(theme: str, custom_path: Optional[Path] = None) -> str:
     """Load CSS theme.
-    
+
     Args:
-        theme: Theme name (default, minimal, brutalist) or 'custom' with custom_path
-        custom_path: Path to custom CSS file
-        
+        theme: Theme name (default, minimal, brutalist) or 'custom' with
+            custom_path.
+        custom_path: Path to custom CSS file.
+
     Returns:
-        CSS string
+        CSS string.
     """
     if custom_path:
         return custom_path.read_text(encoding='utf-8')
-    
     return THEMES.get(theme, DEFAULT_CSS)
 
 
