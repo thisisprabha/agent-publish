@@ -1,5 +1,6 @@
 """Tests for agent-publish."""
 
+import sys
 import tempfile
 from pathlib import Path
 
@@ -211,7 +212,7 @@ def test_cli_version_flag():
     """Test --version flag returns version from pyproject.toml."""
     import subprocess
     result = subprocess.run(
-        ["python", "-m", "agent_publish.cli", "--version"],
+        [sys.executable, "-m", "agent_publish.cli", "--version"],
         capture_output=True, text=True,
     )
     assert result.returncode == 0
@@ -612,7 +613,7 @@ def test_cli_site_title_flag():
     """Test --site-title flag is accepted."""
     import subprocess
     result = subprocess.run(
-        ["python", "-m", "agent_publish.cli", "--site-title", "Test"],
+        [sys.executable, "-m", "agent_publish.cli", "--site-title", "Test"],
         capture_output=True, text=True,
     )
     assert result.returncode != 0  # no subcommand = error
@@ -632,7 +633,7 @@ def test_cli_template_flag():
             '<div class="body">{body}</div></body></html>'
         )
         result = subprocess.run(
-            ["python", "-m", "agent_publish.cli", "publish", str(md),
+            [sys.executable, "-m", "agent_publish.cli", "publish", str(md),
              "--template", str(tpl), "--dry-run"],
             capture_output=True, text=True,
         )
@@ -761,7 +762,7 @@ def test_cli_watch_command_help():
     """Test --watch subcommand shows up in help."""
     import subprocess
     result = subprocess.run(
-        ["python", "-m", "agent_publish.cli", "watch", "--help"],
+        [sys.executable, "-m", "agent_publish.cli", "watch", "--help"],
         capture_output=True, text=True,
     )
     assert result.returncode == 0
@@ -777,7 +778,7 @@ def test_init_creates_default_file():
     import subprocess
     with tempfile.TemporaryDirectory() as tmp:
         result = subprocess.run(
-            ["python", "-m", "agent_publish.cli", "init"],
+            [sys.executable, "-m", "agent_publish.cli", "init"],
             capture_output=True, text=True, cwd=tmp,
         )
         assert result.returncode == 0, result.stderr
@@ -802,7 +803,7 @@ def test_init_respects_config_path():
     with tempfile.TemporaryDirectory() as tmp:
         custom = Path(tmp) / "nested" / "custom.toml"
         result = subprocess.run(
-            ["python", "-m", "agent_publish.cli", "init", "--config", str(custom)],
+            [sys.executable, "-m", "agent_publish.cli", "init", "--config", str(custom)],
             capture_output=True, text=True, cwd=tmp,
         )
         assert result.returncode == 0, result.stderr
@@ -817,7 +818,7 @@ def test_init_refuses_overwrite():
         cfg_path = Path(tmp) / "agent-publish.toml"
         cfg_path.write_text("# existing\n")
         result = subprocess.run(
-            ["python", "-m", "agent_publish.cli", "init"],
+            [sys.executable, "-m", "agent_publish.cli", "init"],
             capture_output=True, text=True, cwd=tmp,
         )
         assert result.returncode == 1, result.stderr
@@ -886,7 +887,7 @@ def test_cli_favicon_flag():
         # Just ensure the CLI parses --favicon and --author without error
         result = subprocess.run(
             [
-                "python", "-m", "agent_publish.cli",
+                sys.executable, "-m", "agent_publish.cli",
                 "publish", str(md),
                 "--dry-run",
                 "--favicon", str(favicon),
