@@ -54,6 +54,7 @@ def _publish_cmd(args):
         site_title=args.site_title,
         show_toc=not args.no_toc,
         strict=args.strict,
+        direction=args.direction,
     )
 
     repo_path = Path(cfg.github_repo_path)
@@ -65,7 +66,9 @@ def _publish_cmd(args):
 
     # Load theme CSS
     from . import themes
-    if cfg.theme_design_path:
+    if cfg.direction:
+        theme_css = themes.load("default", direction=cfg.direction)
+    elif cfg.theme_design_path:
         theme_css = themes.load("default", design_path=cfg.theme_design_path)
     elif cfg.custom_css_path:
         theme_css = themes.load("default", custom_path=cfg.custom_css_path)
@@ -506,6 +509,12 @@ def main():
         "--strict",
         action="store_true",
         help="Fail build on anti-slop violations (warnings become errors)",
+    )
+    pub_parser.add_argument(
+        "--direction",
+        choices=["editorial", "modern-minimal", "warm-soft", "tech-utility", "brutalist"],
+        default=None,
+        help="OKLch-generated color palette direction",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 

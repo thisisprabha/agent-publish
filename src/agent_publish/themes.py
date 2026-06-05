@@ -185,7 +185,7 @@ def _package_themes_dir() -> Path:
     return Path(__file__).parent / "design_themes"
 
 
-def load(theme: str, custom_path: Optional[Path] = None, design_path: Optional[Path] = None) -> str:
+def load(theme: str, custom_path: Optional[Path] = None, design_path: Optional[Path] = None, direction: Optional[str] = None) -> str:
     """Load CSS theme.
 
     Args:
@@ -193,10 +193,15 @@ def load(theme: str, custom_path: Optional[Path] = None, design_path: Optional[P
             custom_path.
         custom_path: Path to custom CSS file.
         design_path: Path to a DESIGN.md file to generate CSS from.
+        direction: OKLch palette direction (e.g. 'editorial').
+            When set, overrides theme/custom_path/design_path.
 
     Returns:
         CSS string.
     """
+    if direction:
+        from . import oklch
+        return oklch.generate_css(direction)
     if design_path:
         from . import designmd
         parsed = designmd.load_design(design_path)
