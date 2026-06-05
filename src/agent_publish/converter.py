@@ -197,6 +197,8 @@ def convert_file(
     author: Optional[str] = None,
     site_title: Optional[str] = None,
     show_toc: bool = True,
+    skill_template: Optional[str] = None,
+    skill_assets: Optional[List[Path]] = None,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -214,6 +216,8 @@ def convert_file(
         author: Optional author name for site metadata
         site_title: Optional site title to show above page title
         show_toc: Whether to insert TOC when 2+ headings exist (default True)
+        skill_template: Optional skill template string (takes precedence over template_override)
+        skill_assets: Optional list of asset paths from the skill to copy into output
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -279,7 +283,9 @@ def convert_file(
     slug = _clean_slug(title)
 
     # Resolve template
-    if template_override and template_override.exists():
+    if skill_template:
+        template = skill_template
+    elif template_override and template_override.exists():
         template = template_override.read_text(encoding='utf-8')
     else:
         template = DEFAULT_TEMPLATE
@@ -335,6 +341,17 @@ def convert_file(
             # Already in output dir — ensure it's tracked
             if dest_favicon not in assets_copied:
                 assets_copied.insert(0, dest_favicon)
+
+    # Copy skill assets to output if provided
+    if skill_assets:
+        import shutil
+        for asset in skill_assets:
+            if asset.exists():
+                dest_asset = output_dir / asset.name
+                if asset.resolve() != dest_asset.resolve():
+                    shutil.copy2(asset, dest_asset)
+                    if dest_asset not in assets_copied:
+                        assets_copied.append(dest_asset)
 
     output_name = f"{date}-{slug}.html"
     output_path = output_dir / output_name

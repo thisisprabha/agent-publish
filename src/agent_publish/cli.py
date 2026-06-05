@@ -4,6 +4,7 @@ import argparse
 import importlib.metadata
 import sys
 from pathlib import Path
+from typing import List, Optional
 
 from rich.console import Console
 from rich.table import Table
@@ -55,7 +56,22 @@ def _publish_cmd(args):
         show_toc=not args.no_toc,
         strict=args.strict,
         direction=args.direction,
+        skill=args.skill,
     )
+
+    # Resolve skill template and assets if requested
+    skill_template: Optional[str] = None
+    skill_assets: Optional[List[Path]] = None
+    if cfg.skill:
+        from .skills_loader import get_builtin_skills_dir, load_skill
+        skill_dir = get_builtin_skills_dir() / cfg.skill
+        try:
+            skill_data = load_skill(skill_dir)
+            skill_template = skill_data["template"]
+            skill_assets = skill_data["assets"]
+        except FileNotFoundError as exc:
+            console.print(f"[red]Error: {exc}[/red]")
+            sys.exit(1)
 
     repo_path = Path(cfg.github_repo_path)
     base_url = cfg.base_url
@@ -98,6 +114,8 @@ def _publish_cmd(args):
                 author=cfg.author,
                 site_title=cfg.site_title,
                 show_toc=cfg.show_toc,
+                skill_template=skill_template,
+                skill_assets=skill_assets,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -235,7 +253,22 @@ def _watch_cmd(args):
         custom_css_path=args.custom_css,
         template_override=args.template_override,
         repo_path=args.repo,
+        skill=args.skill,
     )
+
+    # Resolve skill template if requested
+    skill_template: Optional[str] = None
+    skill_assets: Optional[List[Path]] = None
+    if cfg.skill:
+        from .skills_loader import get_builtin_skills_dir, load_skill
+        skill_dir = get_builtin_skills_dir() / cfg.skill
+        try:
+            skill_data = load_skill(skill_dir)
+            skill_template = skill_data["template"]
+            skill_assets = skill_data["assets"]
+        except FileNotFoundError as exc:
+            console.print(f"[red]Error: {exc}[/red]")
+            sys.exit(1)
 
     repo_path = Path(cfg.github_repo_path) if cfg.github_repo_path else Path.cwd()
     watch_dir = Path(args.watch_dir) if args.watch_dir else repo_path
@@ -258,6 +291,8 @@ def _watch_cmd(args):
         template_override=cfg.template_override,
         entry_type=args.type,
         og_image=args.og_image,
+        skill_template=skill_template,
+        skill_assets=skill_assets,
     )
     server.start()
 
@@ -516,6 +551,11 @@ def main():
         default=None,
         help="OKLch-generated color palette direction",
     )
+    pub_parser.add_argument(
+        "--skill",
+        default=None,
+        help="Skill name to use for template (article, briefing, changelog, deck)",
+    )
     pub_parser.set_defaults(func=_publish_cmd)
 
     # ---- index command ----
@@ -594,6 +634,11 @@ def main():
         default=None,
         dest="og_image",
         help="Open Graph image URL for social sharing",
+    )
+    watch_parser.add_argument(
+        "--skill",
+        default=None,
+        help="Skill name to use for template (article, briefing, changelog, deck)",
     )
     watch_parser.set_defaults(func=_watch_cmd)
 

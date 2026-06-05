@@ -4,7 +4,7 @@ import http.server
 import socketserver
 import threading
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 from .converter import convert_file
 
@@ -37,6 +37,8 @@ def _rebuild_file(
     template_override: Optional[Path] = None,
     entry_type: str = "daily",
     og_image: Optional[str] = None,
+    skill_template: Optional[str] = None,
+    skill_assets: Optional[List[Path]] = None,
 ) -> bool:
     """Rebuild a single markdown file. Returns True on success."""
     try:
@@ -48,6 +50,8 @@ def _rebuild_file(
             custom_css_path=custom_css_path,
             template_override=template_override,
             og_image=og_image,
+            skill_template=skill_template,
+            skill_assets=skill_assets,
         )
         return True
     except Exception:
@@ -68,6 +72,8 @@ class WatchServer:
         template_override: Optional[Path] = None,
         entry_type: str = "daily",
         og_image: Optional[str] = None,
+        skill_template: Optional[str] = None,
+        skill_assets: Optional[List[Path]] = None,
     ):
         self.watch_dir = Path(watch_dir)
         self.output_dir = Path(output_dir)
@@ -78,6 +84,8 @@ class WatchServer:
         self.template_override = template_override
         self.entry_type = entry_type
         self.og_image = og_image
+        self.skill_template = skill_template
+        self.skill_assets = skill_assets
 
     def _initial_build(self):
         """Build all existing .md files on startup."""
@@ -93,6 +101,8 @@ class WatchServer:
                 template_override=self.template_override,
                 entry_type=self.entry_type,
                 og_image=self.og_image,
+                skill_template=self.skill_template,
+                skill_assets=self.skill_assets,
             )
 
     def _serve(self):
@@ -145,6 +155,8 @@ class WatchServer:
                     template_override=handler_self.server.template_override,
                     entry_type=handler_self.server.entry_type,
                     og_image=handler_self.server.og_image,
+                    skill_template=handler_self.server.skill_template,
+                    skill_assets=handler_self.server.skill_assets,
                 )
                 status = "✓ rebuilt" if ok else "✗ failed"
                 print(f"  {status}: {md_path.name}")

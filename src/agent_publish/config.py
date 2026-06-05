@@ -31,6 +31,7 @@ class Config:
     show_toc: bool = True
     strict: bool = False
     direction: Optional[str] = None
+    skill: Optional[str] = None
 
 
 def _find_config_file() -> Optional[Path]:
@@ -158,6 +159,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "show_toc": "show_toc",
         "strict": "strict",
         "direction": "direction",
+        "skill": "skill",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)
