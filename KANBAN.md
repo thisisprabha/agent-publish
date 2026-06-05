@@ -53,8 +53,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-038**: Anti-slop quality gate — `validator.py` post-conversion checklist: no filler phrases, clean heading hierarchy, no empty sections, code blocks have language tags, no orphan links. `--strict` flag fails build. Zero tokens — regex/heuristic only. | Est: 60min | Skills: python
-- [ ] **AP-039**: Deterministic OKLch color palettes — replace hand-picked hex in themes with generated OKLch. 5 curated directions: Editorial, Modern Minimal, Warm Soft, Tech Utility, Brutalist. `--direction editorial` flag. | Est: 90min | Skills: python, css
+- [ ] **AP-037**: Skill-as-folder extensibility — `skills/` directory where each output type (article, briefing, changelog, deck) is a folder with `SKILL.md` + `template.html` + optional `assets/`. CLI auto-discovers: `agent-publish publish report.md --skill briefing`. | Est: 90min | Skills: python
+- [ ] **AP-011**: README rewrite — accurate feature list matching actual code, install instructions, usage examples, screenshots of all 3 themes + dark mode, architecture diagram, contributing section. | Est: 90min | Skills: docs
 
 ---
 
