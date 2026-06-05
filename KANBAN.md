@@ -1,59 +1,132 @@
-# KANBAN — agent-publish (Open Source)
+# Agent-Publish Kanban
 
-| ID | Task | Status | Day | Notes |
-|---|---|---|---|---|
-| AP-001 | Create project structure (src, tests, docs) | ✅ Done | Day 1 | |
-| AP-002 | Write README with concept and install instructions | ✅ Done | Day 1 | |
-| AP-003 | Write design.md manifesto (design-first philosophy) | ✅ Done | Day 1 | |
-| AP-004 | Wire GitHub repo + push initial commit | ✅ Done | Day 1 | https://github.com/thisisprabha/agent-publish |
-| AP-005 | Add LICENSE (MIT) | ✅ Done | Day 1 | |
-| AP-006 | Write design.md v0.1 — CLI skeleton | ✅ Done | Day 2 | `publish`, `index`, `config` subcommands |
-| AP-007 | Set up pytest + write first failing tests | ✅ Done | Day 2 | |
-| AP-008 | Implement `publish` subcommand (markdown → HTML) | ✅ Done | Day 3 | Supports `--theme`, `--custom-css`, `--date` |
-| AP-009 | Implement `index` subcommand (generate index.html) | ✅ Done | Day 3 | Lists all published entries |
-| AP-010 | Implement `config` subcommand (read TOML) | ✅ Done | Day 4 | |
-| AP-011 | Design manifest parsing (`design.md`) | ✅ Done | Day 4 | |
-| AP-012 | Write `design.md` parser | ✅ Done | Day 5 | Converts design spec to structured data |
-| AP-013 | Generate base template from parsed design | ✅ Done | Day 5 | |
-| AP-014 | Support custom `--design` path | ✅ Done | Day 5 | |
-| AP-015 | Write Day 6 spec (fingerprint + manifest) | ✅ Done | Day 6 | |
-| AP-016 | Implement content fingerprinting (SHA256) | ✅ Done | Day 6 | |
-| AP-017 | Build manifest system (track slug, hash, date, url) | ✅ Done | Day 6 | |
-| AP-018 | Detect duplicate content by fingerprint | ✅ Done | Day 6 | |
-| AP-019 | Write manifest update logic | ✅ Done | Day 7 | |
-| AP-020 | Write Day 7 spec (index, feed, nav, backlink) | ✅ Done | Day 8 | |
-| AP-021 | Build navigation: prev/next links between entries | ✅ Done | Day 8 | |
-| AP-022 | Add back-to-index link in each entry | ✅ Done | Day 8 | |
-| AP-023 | Generate RSS/Atom feed | ✅ Done | Day 8 | |
-| AP-024 | Write Day 8 spec (tests, CI, README polish) | ✅ Done | Day 9 | |
-| AP-025 | Code review + refactor | ✅ Done | Day 9 | |
-| AP-026 | Write comprehensive tests (pytest) | ✅ Done | Day 9 | 52 tests passing |
-| AP-027 | Set up GitHub Actions CI | ✅ Done | Day 9 | `.github/workflows/ci.yml` |
-| AP-028 | README polish + logo placeholder | ✅ Done | Day 9 | |
-| AP-029 | DESIGN.md-driven theme system | ✅ Done | Day 10 | Parser (`designmd.py`), built-in themes, CSS generator, 16 tests |
-| AP-030 | — | — | — | (reserved) |
-| AP-031 | — | — | — | (reserved) |
-| AP-032 | — | — | — | (reserved) |
-| AP-033 | — | — | — | (reserved) |
-| AP-034 | — | — | — | (reserved) |
-| AP-035 | — | — | — | (reserved) |
-| AP-036 | CLI wiring for DESIGN.md `--theme-design` flag | ✅ Done | Day 10 | 73 tests passing, design_path in config/themes/cli |
-| AP-037 | — | — | — | (reserved) |
-| AP-038 | — | — | — | (reserved) |
-| AP-039 | — | — | — | (reserved) |
-| AP-040 | — | — | — | (reserved) |
+Git-based state management for daily agent sprints.
+Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ---
 
-## Legend
+## Done
 
-- ✅ Done — completed and committed
-- 🔄 In Progress — active task
-- 📝 Ready — next up
-- ⏸️ On Hold — blocked or deprioritized
+- [x] **AP-001**: Scaffold core converter module (`src/agent_publish/converter.py`) - markdown → HTML with fenced code, tables, Pygments highlighting | Completed: 2026-06-02
+- [x] **AP-002**: Create base CSS system inline (no external deps) - default, minimal, brutalist themes | Completed: 2026-06-02
+- [x] **AP-003**: Add CLI entry point with argparse - `agent-publish publish input.md --theme default` | Completed: 2026-06-02
+- [x] **AP-004**: GitHub Pages auto-deployment helper - git add/commit/push with fingerprint dedup cache | Completed: 2026-06-02
+- [x] **AP-005**: Config file support (TOML/YAML) - custom CSS paths, template overrides, config discovery | Completed: 2026-06-02
+- [x] **AP-006**: Fenced code block syntax highlighting via Pygments + CodeHilite extension | Completed: 2026-06-02
+- [x] **AP-007**: Image path resolution + asset copy to output directory with src rewriting | Completed: 2026-06-02
+- [x] **AP-010**: Eval/test suite - 16 tests covering converter, config, assets, state, validator | Completed: 2026-06-02
+- [x] **AP-013**: Fix `template.format()` crash — safe substitution with `_safe_format()`, test with `{example}` markdown | Completed: 2026-06-02
+- [x] **AP-014**: Fix empty slug edge case — `_clean_slug()` fallback to "untitled", tests for all-special-char titles | Completed: 2026-06-02
+- [x] **AP-015**: Remove orphaned `state.py` — duplicate fingerprint system, deleted, kept publisher cache as single source | Completed: 2026-06-02
+- [x] **AP-016**: Add `--version` flag to CLI using version from pyproject.toml | Completed: 2026-06-02
+- [x] **AP-017**: Fix validator `verify_file` — replaced H1 regex with html.parser for titles with inline HTML | Completed: 2026-06-02
+- [x] **AP-009**: Dark mode CSS — `@media (prefers-color-scheme: dark)` for all three themes | Completed: 2026-06-02
+- [x] **AP-018**: CSS transitions — smooth scroll, heading anchor hover, table row hover, link underline transition, code block hover border | Completed: 2026-06-02
+- [x] **AP-019**: Fix brutalist theme — added `.meta`, `.back`, `blockquote`, `pre code` styles, responsive rules | Completed: 2026-06-02
+- [x] **AP-020**: Accessibility pass — `:focus-visible` outlines, skip-to-content link, `aria-label` on nav, WCAG AA contrast | Completed: 2026-06-02
+- [x] **AP-021**: Responsive breakpoints — mobile (<640px) and tablet (<1024px) for all themes | Completed: 2026-06-02
+- [x] **AP-022**: Print stylesheet — `@media print` for minimal and brutalist, hide nav, expand links, clean page breaks | Completed: 2026-06-02
+- [x] **AP-023**: Index page generator — `agent-publish index` scans HTML, extracts title/date/type, generates styled `index.html` | Completed: 2026-06-02
+- [x] **AP-024**: RSS/Atom feed — `feed.xml` alongside index, standard RSS 2.0 format | Completed: 2026-06-02
+- [x] **AP-025**: Reading time + OG meta tags — word count / 200 WPM, `<meta property="og:*">`, `--og-image` flag | Completed: 2026-06-02
+- [x] **AP-026**: `--watch` mode — local dev server with `http.server`, auto-rebuild on .md change via `watchdog`, localhost:8080 | Completed: 2026-06-02
+- [x] **AP-027**: `--init` command — scaffold `agent-publish.toml` with commented defaults, interactive prompts for theme/output dir/git | Completed: 2026-06-02
+- [x] **AP-028**: Mermaid diagram support — detect ` ```mermaid` blocks, inject mermaid.js CDN only when needed, client-side render | Completed: 2026-06-02
+- [x] **AP-036**: DESIGN.md portable theme spec — structured Markdown theme files, converter reads DESIGN.md → generates CSS at build time, 16 tests | Completed: 2026-06-06
+- [x] **AP-040**: Fix CLI `--template` crash — use `args.template_override`, add regression test | Completed: 2026-06-05
 
 ---
 
-## Next Phase
+## Review
 
-Day 11: TBD (CLI `--theme-design` completion → integration tests)
+*No tasks under review.*
+
+---
+
+## In Progress
+
+*Max 2 cards. Cron picks these up and works until done or blocked.*
+
+---
+
+## Ready (Next Up)
+
+- [ ] **AP-008**: TOC sidebar — wire `md.toc` into HTML template as optional sidebar/nav, add `--toc` CLI flag, sticky desktop / collapsible mobile | Est: 60min | Skills: python, css
+- [ ] **AP-029**: Favicon + site metadata — favicon support via config (`favicon = "path/to/icon.png"`), site title/author for consistent headers | Est: 30min | Skills: python, html
+
+---
+
+## Backlog
+
+### Phase 1: Bug fixes (do these first)
+
+- [ ] **AP-015**: Remove orphaned `state.py` — duplicate fingerprint system that's never called from cli.py or converter.py. Publisher has its own cache. Delete state.py, remove its tests if any, keep publisher cache as single source of truth. | Est: 20min | Skills: python
+- [ ] **AP-016**: Add `--version` flag to CLI using version from pyproject.toml | Est: 15min | Skills: python
+- [ ] **AP-017**: Fix validator `verify_file` — H1 regex fails on titles with inline HTML or attributes. Use proper HTML parser (html.parser) instead of regex. | Est: 30min | Skills: python
+
+### Phase 2: CSS polish + transitions
+
+- [ ] **AP-009**: Dark mode CSS — add `@media (prefers-color-scheme: dark)` block to all three themes. Dark variants: default (warm dark), minimal (true black), brutalist (already dark, just needs light alt). Test with sample HTML. | Est: 60min | Skills: css
+- [ ] **AP-018**: CSS transitions — add smooth scroll (`html { scroll-behavior: smooth }`), heading anchor hover reveal, table row hover highlight (`tr:hover`), link underline transition, code block hover border. All three themes. Zero JS. | Est: 45min | Skills: css
+- [ ] **AP-019**: Fix brutalist theme — missing styles for `.meta`, `.back`, `blockquote`, `pre code`. Add responsive rules. Complete the theme so it's actually usable. | Est: 30min | Skills: css
+- [ ] **AP-020**: Accessibility pass — add `:focus-visible` outlines, skip-to-content link in template, `aria-label` on nav elements, ensure color contrast meets WCAG AA in all themes. | Est: 45min | Skills: css, html
+- [ ] **AP-021**: Responsive breakpoints — add `@media` queries for mobile (<640px) and tablet (<1024px) to all themes. Test: heading sizes, table horizontal scroll, code block overflow. | Est: 45min | Skills: css
+- [ ] **AP-022**: Print stylesheet — add `@media print` to minimal and brutalist (default already has one). Hide nav, expand links, ensure clean page breaks. | Est: 30min | Skills: css
+
+### Phase 3: Zero-token features
+
+- [ ] **AP-008**: TOC sidebar — the `toc` markdown extension is already loaded. Wire `md.toc` into the HTML template as an optional sidebar/nav. Add `--toc` CLI flag. Sticky on desktop, collapsible on mobile. | Est: 60min | Skills: python, css
+- [ ] **AP-023**: Index page generator — `agent-publish index --output-dir ./dist` scans all published HTML files, extracts title/date/type from meta, generates a styled `index.html` listing all pages sorted by date. Use same theme as individual pages. | Est: 90min | Skills: python
+- [ ] **AP-024**: RSS/Atom feed — generate `feed.xml` alongside index page. Extract title, date, first paragraph as description. Standard RSS 2.0 format. Update on every publish. | Est: 60min | Skills: python
+- [ ] **AP-025**: Reading time + OG meta tags — calculate reading time (word count / 200 WPM), add to `.meta` line in template. Generate `<meta property="og:title/description/image">` from title + first paragraph. Add `--og-image` flag for custom social image. | Est: 45min | Skills: python, html
+- [ ] **AP-026**: `--watch` mode — local dev server with `http.server`, auto-rebuild on .md file change using `watchdog`. Serve on localhost:8080. Print URL on start. | Est: 60min | Skills: python
+- [ ] **AP-027**: `--init` command — scaffold `agent-publish.toml` config file in current directory with commented defaults. Interactive prompts for theme, output dir, git repo path. | Est: 30min | Skills: python
+- [ ] **AP-028**: Mermaid diagram support — detect ` ```mermaid` fenced blocks, inject mermaid.js CDN script (only when mermaid blocks exist), render client-side. Zero tokens. | Est: 45min | Skills: python, js
+- [ ] **AP-029**: Favicon + site metadata — add favicon support via config (`favicon = "path/to/icon.png"`), generate `<link rel="icon">`. Add site title/author config for consistent headers. | Est: 30min | Skills: python, html
+
+### Phase 4: Architecture upgrades (inspired by open-design)
+
+- [ ] **AP-036**: DESIGN.md portable theme spec — replace inline CSS strings in `themes.py` with structured Markdown files (`themes/default/DESIGN.md`, `themes/minimal/DESIGN.md`, etc.). Each DESIGN.md defines: color tokens, typography, spacing, layout, motion, and anti-patterns as readable sections. Converter reads DESIGN.md → generates CSS at build time. Non-devs can edit themes without touching Python. Ref: open-design's 9-section DESIGN.md schema. | Est: 120min | Skills: python, css
+- [ ] **AP-037**: Skill-as-folder extensibility — add `skills/` directory pattern where each output type (article, briefing, changelog, deck) is a folder containing `SKILL.md` (instructions + template hints) + `template.html` (custom HTML template) + optional `assets/`. CLI auto-discovers skills: `agent-publish publish report.md --skill briefing`. Drop a folder in, it appears as an option. Ref: open-design's skill-as-folder convention. | Est: 90min | Skills: python
+- [ ] **AP-038**: Anti-slop quality gate — add `validator.py` post-conversion checklist that scores output HTML on 5 dimensions: (1) no repeated filler phrases like "comprehensive analysis", "it's worth noting" (2) heading hierarchy is clean H1→H2→H3 (3) no empty sections (4) code blocks have language tags (5) no orphan links. Run automatically, print warnings. `--strict` flag fails the build on violations. Zero tokens — pure regex/heuristic checks. | Est: 60min | Skills: python
+- [ ] **AP-039**: Deterministic OKLch color palettes — replace hand-picked hex colors in themes with generated OKLch palettes. Define 5 curated visual directions: Editorial (serif, warm), Modern Minimal (sans, neutral), Warm Soft (rounded, muted), Tech Utility (mono, sharp), Brutalist (mono, high contrast). Each direction locks a palette + font stack in DESIGN.md. `--direction editorial` flag on CLI. Prevents theme "freestyle" — colors always harmonize. | Est: 90min | Skills: python, css
+
+### Phase 5: Open-source readiness
+
+- [ ] **AP-011**: README rewrite — accurate feature list matching actual code, install instructions, usage examples, screenshots of all 3 themes + dark mode, architecture diagram, contributing section. | Est: 90min | Skills: docs
+- [ ] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Est: 60min | Skills: python, ci
+- [ ] **AP-030**: Add LICENSE file (MIT) + CONTRIBUTING.md with dev setup, code style, PR process. | Est: 30min | Skills: docs
+- [ ] **AP-031**: GitHub Actions CI — run pytest on push/PR, lint with ruff, build wheel, test `pip install` from wheel. Badge in README. | Est: 60min | Skills: ci
+- [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
+
+### Phase 6: Optional AI enhancements (tokens only when user opts in)
+
+- [ ] **AP-033**: `--humanize` flag architecture — add optional post-processing hook in converter pipeline. When `--humanize` is passed, pipe markdown through an LLM rewrite before HTML conversion. Support `AGENT_PUBLISH_API_KEY` env var. If no key, skip gracefully with warning. Core pipeline stays zero-token. | Est: 90min | Skills: python
+- [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as a styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
+- [ ] **AP-035**: Smart tagging — when `--auto-tag` passed, classify content into categories (research, briefing, changelog, tutorial, etc.) and add as HTML meta tags + visible badges. Zero-token fallback: keyword matching. | Est: 60min | Skills: python
+
+---
+
+## Archive
+
+*Shipped releases / abandoned ideas. Reference only.*
+
+---
+
+## How This Works
+
+1. **Cron runs every 5h** via Hermes cron
+2. **Cron loads only**: `kanban-codex-lane` skill + this file
+3. **Picks top 2** from "Ready" column
+4. **Executes each card** → writes code → runs tests → commits → pushes
+5. **Moves cards** Ready → In Progress → Done
+6. **Telegram summary** sent to Prabha
+
+**Card format:**
+```
+- [ ] **AP-XXX**: Description | Est: time | Skills: skill1, skill2
+```
+
+**Promotion rule:** When Ready is empty, promote the next 2 cards from the topmost Backlog phase. Phases are ordered: bug fixes → CSS → zero-token features → architecture (open-design inspired) → open-source → AI enhancements.
+
+**Token budget per run:** ~4K loaded context
