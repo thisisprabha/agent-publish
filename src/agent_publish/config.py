@@ -29,6 +29,7 @@ class Config:
     favicon: Optional[Path] = None
     author: str = ""
     show_toc: bool = True
+    strict: bool = False
 
 
 def _find_config_file() -> Optional[Path]:
@@ -102,6 +103,7 @@ def load_config(path: Optional[Path] = None) -> Config:
         favicon=_resolve_path(output.get("favicon"), cfg_dir),
         author=output.get("author", ""),
         show_toc=output.get("show_toc", True),
+        strict=validation.get("strict", False),
     )
 
     if cfg.favicon is not None and not cfg.favicon.exists():
@@ -152,6 +154,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "favicon": "favicon",
         "author": "author",
         "show_toc": "show_toc",
+        "strict": "strict",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)

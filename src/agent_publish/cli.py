@@ -12,7 +12,7 @@ from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .index import generate_index_and_feed
 from .publisher import GitPublisher
-from .validator import Validator
+from .validator import Validator, AntiSlopChecker
 from .watch import WatchServer
 
 console = Console()
@@ -53,6 +53,7 @@ def _publish_cmd(args):
         author=args.author,
         site_title=args.site_title,
         show_toc=not args.no_toc,
+        strict=args.strict,
     )
 
     repo_path = Path(cfg.github_repo_path)
@@ -97,6 +98,25 @@ def _publish_cmd(args):
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
+
+        # Anti-slop quality gate
+        html_content = result.output_path.read_text(encoding="utf-8")
+        checker = AntiSlopChecker()
+        violations = checker.check(html_content)
+        if violations:
+            errors = [v for v in violations if v.severity == "error"]
+            warnings = [v for v in violations if v.severity == "warning"]
+            for e in errors:
+                console.print(f"[red]✗[/red]  {e.category}: {e.details}")
+            for w in warnings:
+                tag = "[red]✗[/red]" if cfg.strict else "[yellow]⚠[/yellow]"
+                console.print(f"{tag}  {w.category}: {w.details}")
+            if errors or cfg.strict:
+                console.print(
+                    f"[red]Build failed: {len(errors)} errors, "
+                    f"{len(warnings)}{' (strict)' if not errors else ''}[/red]"
+                )
+                sys.exit(1)
 
         # Publish (unless dry-run)
         if not args.dry_run:
@@ -481,6 +501,11 @@ def main():
         "--no-toc",
         action="store_true",
         help="Disable table of contents sidebar",
+    )
+    pub_parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="Fail build on anti-slop violations (warnings become errors)",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 
