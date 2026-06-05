@@ -21,7 +21,7 @@ The "3 AM problem": You run overnight research, get markdown output... now what?
 ## Install
 
 ```bash
-pip install agent-publish
+pip install agentpub
 ```
 
 Or from source:
