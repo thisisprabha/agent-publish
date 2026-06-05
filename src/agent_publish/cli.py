@@ -51,6 +51,8 @@ def _publish_cmd(args):
         mermaid=not args.no_mermaid,
         favicon=args.favicon,
         author=args.author,
+        site_title=args.site_title,
+        show_toc=not args.no_toc,
     )
 
     repo_path = Path(cfg.github_repo_path)
@@ -90,6 +92,8 @@ def _publish_cmd(args):
                 mermaid=cfg.mermaid,
                 favicon=cfg.favicon,
                 author=cfg.author,
+                site_title=cfg.site_title,
+                show_toc=cfg.show_toc,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -467,6 +471,16 @@ def main():
         "--author",
         default=None,
         help="Author name for site metadata",
+    )
+    pub_parser.add_argument(
+        "--site_title",
+        default=None,
+        help="Site title shown in page header",
+    )
+    pub_parser.add_argument(
+        "--no-toc",
+        action="store_true",
+        help="Disable table of contents sidebar",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 

@@ -34,6 +34,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-028**: Mermaid diagram support — detect ` ```mermaid` blocks, inject mermaid.js CDN only when needed, client-side render | Completed: 2026-06-02
 - [x] **AP-036**: DESIGN.md portable theme spec — structured Markdown theme files, converter reads DESIGN.md → generates CSS at build time, 16 tests | Completed: 2026-06-06
 - [x] **AP-040**: Fix CLI `--template` crash — use `args.template_override`, add regression test | Completed: 2026-06-05
+- [x] **AP-008**: TOC sidebar — `--toc` / `--no-toc` CLI flag, `show_toc` config, sticky desktop CSS, collapsible mobile | Completed: 2026-06-05
+- [x] **AP-029**: Favicon + site metadata — `favicon` config/CLI, `site_title`, `author` wired into template, favicon copied to output | Completed: 2026-06-05
 
 ---
 
@@ -51,8 +53,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-008**: TOC sidebar — wire `md.toc` into HTML template as optional sidebar/nav, add `--toc` CLI flag, sticky desktop / collapsible mobile | Est: 60min | Skills: python, css
-- [ ] **AP-029**: Favicon + site metadata — favicon support via config (`favicon = "path/to/icon.png"`), site title/author for consistent headers | Est: 30min | Skills: python, html
+*No tasks ready for next up.*
 
 ---
 

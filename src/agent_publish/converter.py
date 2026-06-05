@@ -158,8 +158,9 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{title}</title>
+<title>{html_title}</title>
 {og_tags}
+{author_meta}
 {favicon_tag}
 <style>
 {css}
@@ -170,7 +171,8 @@ DEFAULT_TEMPLATE = '''<!DOCTYPE html>
 <a href="../" class="back">&larr; Back</a>
 
 <header>
-  <h1>{title}</h1>
+  {site_title_tag}
+  <h1>{page_title}</h1>
   <p class="meta">{entry_type} &middot; {date} &middot; {reading_time} min read &middot; <code>{fingerprint}</code></p>
 </header>
 
@@ -193,6 +195,8 @@ def convert_file(
     mermaid: bool = True,
     favicon: Optional[Path] = None,
     author: Optional[str] = None,
+    site_title: Optional[str] = None,
+    show_toc: bool = True,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -208,6 +212,8 @@ def convert_file(
         mermaid: Whether to enable Mermaid diagram support (default True)
         favicon: Optional path to favicon image (copied to output and linked)
         author: Optional author name for site metadata
+        site_title: Optional site title to show above page title
+        show_toc: Whether to insert TOC when 2+ headings exist (default True)
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -254,8 +260,8 @@ def convert_file(
     if mermaid:
         html_body = _unwrap_mermaid(html_body)
 
-    # If TOC has at least 2 entries (meaningful nav), wrap and prepend
-    if toc_html and toc_html.count('<a href="#') >= 2:
+    # If TOC has at least 2 entries (meaningful nav) and show_toc is True, wrap and prepend
+    if show_toc and toc_html and toc_html.count('<a href="#') >= 2:
         toc_nav = f'<nav class="toc">{toc_html}</nav>\n'
         html_body = toc_nav + html_body
 
@@ -288,9 +294,17 @@ def convert_file(
     if favicon and favicon.exists():
         favicon_tag = f'<link rel="icon" type="image/x-icon" href="{favicon.name}">'
 
+    # Build site metadata
+    html_title = f"{site_title} — {title}" if site_title else title
+    author_meta = f'<meta name="author" content="{author}">\n' if author else ""
+    site_title_tag = f'<p class="site-title">{site_title}</p>\n' if site_title else ""
+
     html = _safe_format(
         template,
+        html_title=html_title,
+        author_meta=author_meta,
         title=title,
+        page_title=title,
         css=css,
         fingerprint=fingerprint,
         date=date,
@@ -299,6 +313,7 @@ def convert_file(
         reading_time=reading_time,
         og_tags=og_tags,
         favicon_tag=favicon_tag,
+        site_title_tag=site_title_tag,
     )
 
     # Inject Mermaid.js if mermaid blocks are present and mermaid is enabled
