@@ -7,6 +7,9 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Done
 
+- [x] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Completed: 2026-06-07
+- [x] **AP-030**: Add LICENSE file (MIT) + CONTRIBUTING.md with dev setup, code style, PR process. | Completed: 2026-06-07
+- [x] **AP-031**: GitHub Actions CI — run pytest on push/PR, lint with ruff, build wheel, test `pip install` from wheel. | Completed: 2026-06-07
 - [x] **AP-001**: Scaffold core converter module (`src/agent_publish/converter.py`) — markdown → HTML with fenced code, tables, Pygments highlighting | Completed: 2026-06-02
 - [x] **AP-002**: Create base CSS system inline (no external deps) — default, minimal, brutalist themes | Completed: 2026-06-02
 - [x] **AP-003**: Add CLI entry point with argparse — `agent-publish publish input.md --theme default` | Completed: 2026-06-02
@@ -55,7 +58,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-011**: README rewrite — accurate feature list matching actual code, install instructions, usage examples, screenshots of all 3 themes + dark mode, architecture diagram, contributing section. | Est: 90min | Skills: docs
+- [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
 
 ---
 
@@ -63,10 +66,6 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ### Phase 5: Open-source readiness
 
-- [ ] **AP-011**: README rewrite — accurate feature list matching actual code, install instructions, usage examples, screenshots of all 3 themes + dark mode, architecture diagram, contributing section. | Est: 90min | Skills: docs
-- [ ] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Est: 60min | Skills: python, ci
-- [ ] **AP-030**: Add LICENSE file (MIT) + CONTRIBUTING.md with dev setup, code style, PR process. | Est: 30min | Skills: docs
-- [ ] **AP-031**: GitHub Actions CI — run pytest on push/PR, lint with ruff, build wheel, test `pip install` from wheel. Badge in README. | Est: 60min | Skills: ci
 - [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
 
 ### Phase 6: Optional AI enhancements (tokens only when user opts in)
