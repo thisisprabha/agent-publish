@@ -1,4 +1,4 @@
-"""DESIGN.md parser — reads structured Markdown theme spec and generates CSS.
+"""DESIGN.md parser -- reads structured Markdown theme spec and generates CSS.
 
 Schema: YAML front-matter with typed token groups (colors, typography, spacing, rounded).
 Markdown body holds the nine canonical sections for human readability.

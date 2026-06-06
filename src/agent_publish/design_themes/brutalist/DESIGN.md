@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: "Agent Publish — Brutalist"
+name: "Agent Publish -- Brutalist"
 colors:
   bg: "#000"
   fg: "#0f0"

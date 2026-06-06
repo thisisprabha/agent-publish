@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: "Agent Publish — Default"
+name: "Agent Publish -- Default"
 colors:
   bg: "#faf8f5"
   fg: "#1c1917"

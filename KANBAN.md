@@ -37,6 +37,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-008**: TOC sidebar — `--toc` / `--no-toc` CLI flag, `show_toc` config, sticky desktop CSS, collapsible mobile | Completed: 2026-06-05
 - [x] **AP-040**: Fix CLI `--template` crash — use `args.template_override`, add regression test | Completed: 2026-06-05
 - [x] **AP-037**: Skill-as-folder extensibility — `skills/` directory with `SKILL.md` + `template.html` + optional `assets/`. CLI auto-discovers: `--skill briefing`. 4 built-in skills, 14 tests | Completed: 2026-06-06
+- [x] **AP-011**: README rewrite — accurate feature list matching actual code, install from source instructions, CLI table, theme docs, architecture tree, contributing section, 5 example markdowns. | Completed: 2026-06-06
 
 ---
 

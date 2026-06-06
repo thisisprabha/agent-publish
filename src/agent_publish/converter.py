@@ -301,7 +301,7 @@ def convert_file(
         favicon_tag = f'<link rel="icon" type="image/x-icon" href="{favicon.name}">'
 
     # Build site metadata
-    html_title = f"{site_title} — {title}" if site_title else title
+    html_title = f"{site_title} -- {title}" if site_title else title
     author_meta = f'<meta name="author" content="{author}">\n' if author else ""
     site_title_tag = f'<p class="site-title">{site_title}</p>\n' if site_title else ""
 
@@ -338,7 +338,7 @@ def convert_file(
             shutil.copy2(favicon, dest_favicon)
             assets_copied.insert(0, dest_favicon)
         else:
-            # Already in output dir — ensure it's tracked
+            # Already in output dir -- ensure it's tracked
             if dest_favicon not in assets_copied:
                 assets_copied.insert(0, dest_favicon)
 

@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: "Agent Publish — Minimal"
+name: "Agent Publish -- Minimal"
 colors:
   bg: "#fff"
   fg: "#111"
