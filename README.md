@@ -29,6 +29,8 @@ The "3 AM problem": You run overnight research, get markdown output... now what?
 
 ## Install
 
+The PyPI package name is `agentpub`.
+
 From source (recommended while pre-PyPI):
 
 ```bash

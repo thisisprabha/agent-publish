@@ -51,7 +51,6 @@ src/agent_publish/
   themes.py              # Built-in CSS themes + OKLch + DESIGN.md parser
   templates.py           # HTML template system
   skills.py              # Skill-as-folder loader (SKILL.md + template.html)
-  state.py               # (removed — kept in publisher.py)
 tests/                   # Pytest suite (run with pytest)
 examples/                # Sample markdowns + pre-built HTML
 ```
