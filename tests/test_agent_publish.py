@@ -155,7 +155,6 @@ def test_validator_h1_with_inline_html():
 
 def test_publisher_cache_dedup():
     """Test GitPublisher fingerprint deduplication."""
-    import uuid
     from agent_publish.publisher import GitPublisher
     
     with tempfile.TemporaryDirectory() as tmp:
@@ -344,7 +343,7 @@ def test_converter_with_image():
         image = Path(tmp) / "diagram.png"
         image.write_text("fake-png-data")
         input_file = Path(tmp) / "report.md"
-        input_file.write_text(f"# Report with Image\n\n![diagram](diagram.png)\n")
+        input_file.write_text("# Report with Image\n\n![diagram](diagram.png)\n")
 
         result = convert_file(input_file, Path(tmp), "daily")
 
@@ -854,7 +853,6 @@ def test_converter_favicon_and_author():
 
 def test_load_config_favicon_and_author():
     """Test config parsing for favicon and author fields."""
-    import toml
     from agent_publish.config import load_config
 
     with tempfile.TemporaryDirectory() as tmp:

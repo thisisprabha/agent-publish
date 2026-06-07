@@ -1,7 +1,9 @@
-import pytest
 from pathlib import Path
+
+import pytest
+
 from agent_publish import designmd
-from agent_publish.themes import list_themes, load, THEMES
+from agent_publish.themes import THEMES, list_themes, load
 
 # ── helpers ──
 
@@ -237,7 +239,8 @@ def test_themes_load_design_path_priority_over_custom_path(tmp_path: Path):
 
 def test_cli_help_shows_theme_design_flag():
     """Ensure --theme-design appears in CLI help output."""
-    import subprocess, sys
+    import subprocess
+    import sys
     result = subprocess.run(
         [sys.executable, "-m", "agent_publish.cli", "publish", "--help"],
         capture_output=True,

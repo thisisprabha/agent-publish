@@ -5,9 +5,13 @@ from pathlib import Path
 
 import pytest
 
-from agent_publish.skills_loader import discover_skills, get_builtin_skills_dir, load_skill
-from agent_publish.converter import convert_file
 from agent_publish.config import Config, merge_with_cli_args
+from agent_publish.converter import convert_file
+from agent_publish.skills_loader import (
+    discover_skills,
+    get_builtin_skills_dir,
+    load_skill,
+)
 
 
 def test_get_builtin_skills_dir():

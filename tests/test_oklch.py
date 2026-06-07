@@ -1,6 +1,5 @@
 """Tests for OKLch color generation."""
 
-import math
 
 import pytest
 
@@ -11,7 +10,6 @@ from agent_publish.oklch import (
     oklch_to_srgb,
     rgb_to_oklch,
 )
-
 
 # ---------------------------------------------------------------------------
 # Round-trip
@@ -122,7 +120,6 @@ def test_generate_css_each_direction():
 def test_dark_lightness_is_inverted():
     """For a light background, dark bg should be dark."""
     palette = generate_palette("modern-minimal")
-    light_bg_L = 0.995  # from our source table
     dark_bg_hex = palette["dark"]["bg"]
     # dark bg should be near-black
     dark_val = int(dark_bg_hex[1:], 16)

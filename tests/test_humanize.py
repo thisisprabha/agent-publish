@@ -1,12 +1,9 @@
 """Tests for the humanize module."""
 
-import os
 import json
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
-from agent_publish.humanize import humanize_markdown, _get_api_config
-
+from agent_publish.humanize import _get_api_config, humanize_markdown
 
 # ── _get_api_config ──────────────────────────────────────────────────────────
 
