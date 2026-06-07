@@ -7,6 +7,8 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Done
 
+- [x] **AP-035**: Smart tagging — zero-token keyword extraction + LLM enhancement, `--tags` flag, CSS badge styles. | Completed: 2026-06-08
+- [x] **AP-034**: Auto TL;DR — `--tldr` flag architecture with LLM + zero-token fallback, styled callout injection. | Completed: 2026-06-07
 - [x] **AP-033**: `--humanize` flag architecture — optional post-processing hook in converter pipeline. When `--humanize` passed, pipe markdown through LLM rewrite before HTML conversion. Support `AGENT_PUBLISH_API_KEY` env var. Skip gracefully if no key. | Completed: 2026-06-07
 - [x] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Completed: 2026-06-07
 - [x] **AP-030**: Add LICENSE file (MIT) + CONTRIBUTING.md with dev setup, code style, PR process. | Completed: 2026-06-07
@@ -54,14 +56,15 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## In Progress
 
-*Max 2 cards. Cron picks these up and works until done or blocked.*
+- [ ] **AP-036**: Multi-format export plugin — `--format epub,pdf` alongside `--to-gh`. Hook-based architecture: `register_exporter(ext, callable)`. Built-in: markdown (passthrough), html (default), epub (zip-based), pdf (weasyprint optional). | Est: 90min | Skills: python, hooks
+- [ ] **AP-037**: Image optimization pipeline — when `--optimize-images` passed, compress JPEG/PNG in-place, convert oversized PNG → WebP, strip EXIF. Zero dependencies: pure Python PIL or skip. Generate `images_report.json` with before/after sizes. | Est: 75min | Skills: python, image-processing
 
 ---
 
 ## Ready (Next Up)
 
-- [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
-- [ ] **AP-035**: Smart tagging — when `--auto-tag` passed, classify content into categories and add as HTML meta tags + visible badges. Zero-token fallback: keyword matching. | Est: 60min | Skills: python
+- [ ] **AP-038**: Interactive post preview — `--preview` spins up ephemeral HTTP server on :8765 with draft HTML, auto-adds `<meta name="robots" content="noindex">`. LiveReload on file change. SIGINT (Ctrl+C) stops server and deletes temp files. | Est: 75min | Skills: python, http.server, watchdog
+- [ ] **AP-039**: YAML frontmatter schema extensibility — make frontmatter validation pluggable. User can supply custom `.agent_publish_schema.yaml` in repo root. If found, merge with built-in schema. Support `required` fields, `type` (str/int/date/bool/list), `default`, `one_of` enum. Validate on every build. | Est: 90min | Skills: python, yaml
 
 ---
 
