@@ -42,6 +42,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-040**: Fix CLI `--template` crash — use `args.template_override`, add regression test | Completed: 2026-06-05
 - [x] **AP-037**: Skill-as-folder extensibility — `skills/` directory with `SKILL.md` + `template.html` + optional `assets/`. CLI auto-discovers: `--skill briefing`. 4 built-in skills, 14 tests | Completed: 2026-06-06
 - [x] **AP-011**: README rewrite — accurate feature list matching actual code, install from source instructions, CLI table, theme docs, architecture tree, contributing section, 5 example markdowns. | Completed: 2026-06-06
+- [x] **AP-032**: Example gallery — pre-built HTML for all themes (6 markdowns × 3 themes = 18 HTML files) | Completed: 2026-06-07
 
 ---
 
@@ -59,7 +60,6 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
 - [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
 - [ ] **AP-035**: Smart tagging — when `--auto-tag` passed, classify content into categories and add as HTML meta tags + visible badges. Zero-token fallback: keyword matching. | Est: 60min | Skills: python
 
