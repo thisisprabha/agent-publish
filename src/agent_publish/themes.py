@@ -50,6 +50,9 @@ pre code{background:none;padding:0;font-size:inherit}
 .toc a:hover{text-decoration:underline}
 .toc a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .tldr-callout{background:var(--surface);border-left:3px solid var(--accent);padding:.85rem 1.1rem;margin:0 0 1.75rem;font-size:.9rem;color:var(--fg);border-radius:0 6px 6px 0;line-height:1.5}
+.tag-bar{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.5rem}
+.tag{display:inline-block;padding:.18rem .5rem;border-radius:99px;font-size:.75rem;background:var(--surface);color:var(--fg-muted);border:1px solid var(--border);line-height:1.4}
+.tag:before{content:"";display:inline-block;width:.25rem;height:.25rem;border-radius:99px;background:var(--accent);margin-right:.25rem;vertical-align:middle;opacity:.7}
 @media (max-width:640px){html{font-size:15px}header,.main{padding:1rem}h1{font-size:1.35rem}h2{font-size:1.05rem}table{font-size:.8rem;display:block;overflow-x:auto}pre{padding:.75rem}.toc{padding:.75rem}}
 @media (max-width:1024px){header,.main{padding:1.25rem}}
 @media print{body{background:#fff}a[href]:after{content:" (" attr(href) ")";font-size:.75rem;color:var(--muted)}.back{display:none}.toc{display:none}.skip-link{display:none}}

@@ -200,6 +200,7 @@ def convert_file(
     skill_assets: Optional[List[Path]] = None,
     humanize: bool = False,
     tldr: bool = False,
+    tags: bool = False,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -284,6 +285,16 @@ def convert_file(
         tldr_text = generate_tldr(md_content)
         tldr_html = f'<div class="tldr-callout"><strong>TL;DR</strong> \u2014 {tldr_text}</div>\n'
         html_body = tldr_html + html_body
+
+    # Smart tag suggestion
+    if tags:
+        from agent_publish.tags import suggest_tags
+        tag_list = suggest_tags(md_content)
+        if tag_list:
+            tag_html = '<div class="tag-bar">' + ''.join(
+                [f'<span class="tag">#{t}</span>' for t in tag_list]
+            ) + '</div>\n'
+            html_body = tag_html + html_body
 
     # Resolve CSS
     if custom_css_path and custom_css_path.exists():

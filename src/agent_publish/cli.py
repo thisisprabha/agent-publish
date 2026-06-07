@@ -59,6 +59,7 @@ def _publish_cmd(args):
         skill=args.skill,
         humanize=args.humanize,
         tldr=args.tldr,
+        tags=args.tags,
     )
 
     # Resolve skill template and assets if requested
@@ -120,6 +121,7 @@ def _publish_cmd(args):
                 skill_assets=skill_assets,
                 humanize=cfg.humanize,
                 tldr=cfg.tldr,
+                tags=cfg.tags,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -569,6 +571,11 @@ def main():
         "--tldr",
         action="store_true",
         help="Inject auto-generated TL;DR summary at the top of each page (requires AGENT_PUBLISH_API_KEY; falls back to first paragraph)",
+    )
+    pub_parser.add_argument(
+        "--tags",
+        action="store_true",
+        help="Inject auto-suggested topic tags under the title (uses LLM if key set; zero-token fallback if not)",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 

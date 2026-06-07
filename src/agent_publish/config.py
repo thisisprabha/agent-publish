@@ -34,6 +34,7 @@ class Config:
     skill: Optional[str] = None
     humanize: bool = False
     tldr: bool = False
+    tags: bool = False
 
 
 def _find_config_file() -> Optional[Path]:
@@ -164,6 +165,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "skill": "skill",
         "humanize": "humanize",
         "tldr": "tldr",
+        "tags": "tags",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)
