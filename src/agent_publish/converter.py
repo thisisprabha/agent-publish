@@ -199,6 +199,7 @@ def convert_file(
     skill_template: Optional[str] = None,
     skill_assets: Optional[List[Path]] = None,
     humanize: bool = False,
+    tldr: bool = False,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -219,6 +220,7 @@ def convert_file(
         skill_template: Optional skill template string (takes precedence over template_override)
         skill_assets: Optional list of asset paths from the skill to copy into output
         humanize: Whether to rewrite markdown through LLM before conversion (default False)
+        tldr: Whether to inject auto-generated TL;DR summary at the top (default False)
 
     Returns:
         ConversionResult with HTML content and metadata
@@ -275,6 +277,13 @@ def convert_file(
     if show_toc and toc_html and toc_html.count('<a href="#') >= 2:
         toc_nav = f'<nav class="toc">{toc_html}</nav>\n'
         html_body = toc_nav + html_body
+
+    # Auto TL;DR injection
+    if tldr:
+        from agent_publish.tldr import generate_tldr
+        tldr_text = generate_tldr(md_content)
+        tldr_html = f'<div class="tldr-callout"><strong>TL;DR</strong> \u2014 {tldr_text}</div>\n'
+        html_body = tldr_html + html_body
 
     # Resolve CSS
     if custom_css_path and custom_css_path.exists():

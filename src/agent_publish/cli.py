@@ -58,6 +58,7 @@ def _publish_cmd(args):
         direction=args.direction,
         skill=args.skill,
         humanize=args.humanize,
+        tldr=args.tldr,
     )
 
     # Resolve skill template and assets if requested
@@ -118,6 +119,7 @@ def _publish_cmd(args):
                 skill_template=skill_template,
                 skill_assets=skill_assets,
                 humanize=cfg.humanize,
+                tldr=cfg.tldr,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -562,6 +564,11 @@ def main():
         "--humanize",
         action="store_true",
         help="Rewrite markdown through an LLM before conversion (requires AGENT_PUBLISH_API_KEY)",
+    )
+    pub_parser.add_argument(
+        "--tldr",
+        action="store_true",
+        help="Inject auto-generated TL;DR summary at the top of each page (requires AGENT_PUBLISH_API_KEY; falls back to first paragraph)",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 
