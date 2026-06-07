@@ -11,11 +11,9 @@ A DESIGN.md can sit beside an optional base.css file.  The generated output is:
 from __future__ import annotations
 
 import re
-import textwrap
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
-
+from typing import Any
 
 # ---------------------------------------------------------------------------
 # Data model

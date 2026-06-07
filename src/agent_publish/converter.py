@@ -7,9 +7,8 @@ from pathlib import Path
 from typing import List, Optional
 
 import markdown
-from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown.extensions import fenced_code, tables, toc
-
+from markdown.extensions.codehilite import CodeHiliteExtension
 
 _FENCE_RE = re.compile(r'^```mermaid\s*\n(.*?)\n?^```', re.MULTILINE | re.DOTALL)
 
@@ -225,8 +224,9 @@ def convert_file(
         ConversionResult with HTML content and metadata
     """
     from pygments.formatters.html import HtmlFormatter
-    from agent_publish.themes import DEFAULT_CSS
+
     from agent_publish.humanize import humanize_markdown
+    from agent_publish.themes import DEFAULT_CSS
 
     md_content = input_path.read_text(encoding='utf-8')
 

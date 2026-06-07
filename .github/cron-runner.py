@@ -4,11 +4,10 @@ Agent-Publish Daily Sprint Runner
 Stateless cron dispatcher - reads KANBAN.md, executes Ready tasks, commits.
 """
 
-import re
-import os
-import sys
-import subprocess
 import datetime
+import re
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -54,16 +53,9 @@ def parse_task_line(line):
 
 def update_kanban_task(task_id, new_status="In Progress"):
     """Move task from Ready to In Progress in KANBAN.md."""
-    content = KANBAN_PATH.read_text()
-    
-    # Find the task line and update it
-    pattern = rf'(- \[ \] \*\*{task_id}\*\*:.+?)\n'
+    _ = KANBAN_PATH.read_text()
     today = datetime.datetime.now().strftime('%Y-%m-%d')
-    
-    new_line = f"- [ ] **{task_id}**: Task | Started: {today}\n"
-    
-    # This is a simple implementation - full version would parse properly
-    # For now, just log the intent
+    _ = f"- [ ] **{task_id}**: Task | Started: {today}\n"
     print(f"[MOCK] Would move {task_id} to {new_status}")
     return True
 
@@ -120,7 +112,7 @@ def commit_and_push(task_ids):
 
 def main():
     """Main entry point for cron execution."""
-    print(f"Agent-Publish Daily Sprint")
+    print("Agent-Publish Daily Sprint")
     print(f"Started: {datetime.datetime.now().isoformat()}")
     print(f"Repo: {REPO_ROOT}")
     print("-" * 60)

@@ -4,7 +4,7 @@ Auto-discovers and loads skill folders containing SKILL.md + template.html.
 """
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 
 def get_builtin_skills_dir() -> Path:

@@ -1,8 +1,8 @@
 """Validation and eval for agent-publish."""
 
 import html.parser
-import urllib.request
 import re
+import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional

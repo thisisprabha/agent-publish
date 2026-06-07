@@ -13,7 +13,7 @@ from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .index import generate_index_and_feed
 from .publisher import GitPublisher
-from .validator import Validator, AntiSlopChecker
+from .validator import AntiSlopChecker, Validator
 from .watch import WatchServer
 
 console = Console()
@@ -239,7 +239,7 @@ def _index_cmd(args):
             fingerprint="static",
         )
         if add_result.success:
-            console.print(f"[green]✓[/green] Index pushed")
+            console.print("[green]✓[/green] Index pushed")
         else:
             console.print(f"[red]✗[/red] {add_result.message}")
     else:

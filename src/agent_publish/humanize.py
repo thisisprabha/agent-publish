@@ -11,7 +11,6 @@ import os
 import re
 from typing import Optional
 
-
 # Default prompt used for humanization
 _DEFAULT_PROMPT = """You are a writing editor. Improve the following markdown for clarity,
 conciseness, and natural flow. Keep all headings, code blocks, tables, and images intact.
@@ -60,8 +59,8 @@ def humanize_markdown(
     prompt = (prompt_template or _DEFAULT_PROMPT).format(content=md_content)
 
     try:
-        import urllib.request
         import json
+        import urllib.request
 
         headers = {
             "Content-Type": "application/json",
