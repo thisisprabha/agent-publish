@@ -57,6 +57,7 @@ def _publish_cmd(args):
         strict=args.strict,
         direction=args.direction,
         skill=args.skill,
+        humanize=args.humanize,
     )
 
     # Resolve skill template and assets if requested
@@ -116,6 +117,7 @@ def _publish_cmd(args):
                 show_toc=cfg.show_toc,
                 skill_template=skill_template,
                 skill_assets=skill_assets,
+                humanize=cfg.humanize,
             )
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
@@ -555,6 +557,11 @@ def main():
         "--skill",
         default=None,
         help="Skill name to use for template (article, briefing, changelog, deck)",
+    )
+    pub_parser.add_argument(
+        "--humanize",
+        action="store_true",
+        help="Rewrite markdown through an LLM before conversion (requires AGENT_PUBLISH_API_KEY)",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 

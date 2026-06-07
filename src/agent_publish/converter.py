@@ -199,6 +199,7 @@ def convert_file(
     show_toc: bool = True,
     skill_template: Optional[str] = None,
     skill_assets: Optional[List[Path]] = None,
+    humanize: bool = False,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -218,14 +219,20 @@ def convert_file(
         show_toc: Whether to insert TOC when 2+ headings exist (default True)
         skill_template: Optional skill template string (takes precedence over template_override)
         skill_assets: Optional list of asset paths from the skill to copy into output
+        humanize: Whether to rewrite markdown through LLM before conversion (default False)
 
     Returns:
         ConversionResult with HTML content and metadata
     """
     from pygments.formatters.html import HtmlFormatter
     from agent_publish.themes import DEFAULT_CSS
+    from agent_publish.humanize import humanize_markdown
 
     md_content = input_path.read_text(encoding='utf-8')
+
+    # Optional humanization pass
+    if humanize:
+        md_content = humanize_markdown(md_content)
 
     # Extract title and fingerprint
     title = _extract_title(md_content)

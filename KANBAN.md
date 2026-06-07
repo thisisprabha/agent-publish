@@ -7,6 +7,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Done
 
+- [x] **AP-033**: `--humanize` flag architecture — optional post-processing hook in converter pipeline. When `--humanize` passed, pipe markdown through LLM rewrite before HTML conversion. Support `AGENT_PUBLISH_API_KEY` env var. Skip gracefully if no key. | Completed: 2026-06-07
 - [x] **AP-012**: PyPI package prep — verify pyproject.toml classifiers, add LICENSE file (MIT), test `pip install` from source, create GitHub release workflow. | Completed: 2026-06-07
 - [x] **AP-030**: Add LICENSE file (MIT) + CONTRIBUTING.md with dev setup, code style, PR process. | Completed: 2026-06-07
 - [x] **AP-031**: GitHub Actions CI — run pytest on push/PR, lint with ruff, build wheel, test `pip install` from wheel. | Completed: 2026-06-07
@@ -59,20 +60,16 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 ## Ready (Next Up)
 
 - [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
+- [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
+- [ ] **AP-035**: Smart tagging — when `--auto-tag` passed, classify content into categories and add as HTML meta tags + visible badges. Zero-token fallback: keyword matching. | Est: 60min | Skills: python
 
 ---
 
 ## Backlog
 
-### Phase 5: Open-source readiness
-
-- [ ] **AP-032**: Example gallery — create `examples/` with 5 sample markdowns (research report, daily briefing, code walkthrough, meeting notes, changelog) + pre-built HTML for each theme. | Est: 60min | Skills: docs
-
 ### Phase 6: Optional AI enhancements (tokens only when user opts in)
 
-- [ ] **AP-033**: `--humanize` flag architecture — optional post-processing hook in converter pipeline. When `--humanize` passed, pipe markdown through LLM rewrite before HTML conversion. Support `AGENT_PUBLISH_API_KEY` env var. Skip gracefully if no key. | Est: 90min | Skills: python
-- [ ] **AP-034**: Auto TL;DR — when `--tldr` flag passed, generate 2-3 sentence summary and inject at top of HTML as styled callout. Requires API key. Falls back to first paragraph extraction (zero-token) if no key. | Est: 60min | Skills: python
-- [ ] **AP-035**: Smart tagging — when `--auto-tag` passed, classify content into categories and add as HTML meta tags + visible badges. Zero-token fallback: keyword matching. | Est: 60min | Skills: python
+*All Phase 6 tasks promoted to Ready.*
 
 ---
 

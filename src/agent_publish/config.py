@@ -32,6 +32,7 @@ class Config:
     strict: bool = False
     direction: Optional[str] = None
     skill: Optional[str] = None
+    humanize: bool = False
 
 
 def _find_config_file() -> Optional[Path]:
@@ -160,6 +161,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "strict": "strict",
         "direction": "direction",
         "skill": "skill",
+        "humanize": "humanize",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)
