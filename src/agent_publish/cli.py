@@ -13,6 +13,7 @@ from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .index import generate_index_and_feed
 from .publisher import GitPublisher
+from .preview import PreviewServer
 from .validator import AntiSlopChecker, Validator
 from .watch import WatchServer
 
@@ -299,6 +300,70 @@ def _watch_cmd(args):
         og_image=args.og_image,
         skill_template=skill_template,
         skill_assets=skill_assets,
+    )
+    server.start()
+
+
+def _preview_cmd(args):
+    """Handle the preview subcommand."""
+    cfg = load_config(args.config)
+    cfg = merge_with_cli_args(
+        cfg,
+        theme=args.theme,
+        custom_css_path=args.custom_css,
+        template_override=args.template_override,
+        repo_path=args.repo,
+        skill=args.skill,
+        humanize=args.humanize,
+        tldr=args.tldr,
+        tags=args.tags,
+    )
+
+    # Resolve skill template if requested
+    skill_template: Optional[str] = None
+    skill_assets: Optional[List[Path]] = None
+    if cfg.skill:
+        from .skills_loader import get_builtin_skills_dir, load_skill
+        skill_dir = get_builtin_skills_dir() / cfg.skill
+        try:
+            skill_data = load_skill(skill_dir)
+            skill_template = skill_data["template"]
+            skill_assets = skill_data["assets"]
+        except FileNotFoundError as exc:
+            console.print(f"[red]Error: {exc}[/red]")
+            sys.exit(1)
+
+    # Load theme CSS
+    from . import themes
+    if cfg.custom_css_path:
+        theme_css = themes.load("default", custom_path=cfg.custom_css_path)
+    else:
+        theme_css = themes.load(cfg.theme)
+
+    input_path = Path(args.input)
+    if not input_path.exists():
+        console.print(f"[red]Error: {input_path} not found[/red]")
+        sys.exit(1)
+
+    server = PreviewServer(
+        input_path=input_path,
+        port=args.port,
+        theme=cfg.theme,
+        custom_css=theme_css,
+        custom_css_path=cfg.custom_css_path,
+        template_override=cfg.template_override,
+        entry_type=args.type,
+        og_image=args.og_image,
+        skill_template=skill_template,
+        skill_assets=skill_assets,
+        humanize=cfg.humanize,
+        tldr=cfg.tldr,
+        tags=cfg.tags,
+        show_toc=not args.no_toc,
+        mermaid=not args.no_mermaid,
+        favicon=cfg.favicon,
+        author=cfg.author,
+        site_title=cfg.site_title,
     )
     server.start()
 
@@ -662,6 +727,95 @@ def main():
         help="Skill name to use for template (article, briefing, changelog, deck)",
     )
     watch_parser.set_defaults(func=_watch_cmd)
+
+    # ---- preview command ----
+    preview_parser = subparsers.add_parser("preview", help="Preview a single markdown file with ephemeral server")
+    preview_parser.add_argument(
+        "input",
+        help="Markdown file to preview",
+    )
+    preview_parser.add_argument(
+        "--port",
+        type=int,
+        default=8765,
+        help="Port for preview server (default: 8765)",
+    )
+    preview_parser.add_argument(
+        "--type",
+        default="daily",
+        choices=["daily", "weekly", "note", "research"],
+        help="Entry type",
+    )
+    preview_parser.add_argument(
+        "--theme",
+        choices=["default", "minimal", "brutalist"],
+        help="CSS theme",
+    )
+    preview_parser.add_argument(
+        "--custom-css",
+        type=Path,
+        dest="custom_css",
+        help="Path to custom CSS file",
+    )
+    preview_parser.add_argument(
+        "--template",
+        type=Path,
+        dest="template_override",
+        help="Path to custom HTML template file",
+    )
+    preview_parser.add_argument(
+        "--og-image",
+        default=None,
+        dest="og_image",
+        help="Open Graph image URL for social sharing",
+    )
+    preview_parser.add_argument(
+        "--skill",
+        default=None,
+        help="Skill name to use for template (article, briefing, changelog, deck)",
+    )
+    preview_parser.add_argument(
+        "--humanize",
+        action="store_true",
+        help="Rewrite markdown through an LLM before conversion (requires AGENT_PUBLISH_API_KEY)",
+    )
+    preview_parser.add_argument(
+        "--tldr",
+        action="store_true",
+        help="Inject auto-generated TL;DR summary at the top (requires AGENT_PUBLISH_API_KEY; falls back to first paragraph)",
+    )
+    preview_parser.add_argument(
+        "--tags",
+        action="store_true",
+        help="Inject auto-suggested topic tags under the title",
+    )
+    preview_parser.add_argument(
+        "--no-toc",
+        action="store_true",
+        help="Disable table of contents sidebar",
+    )
+    preview_parser.add_argument(
+        "--no-mermaid",
+        action="store_true",
+        help="Skip Mermaid diagram processing",
+    )
+    preview_parser.add_argument(
+        "--favicon",
+        type=Path,
+        default=None,
+        help="Path to favicon image",
+    )
+    preview_parser.add_argument(
+        "--author",
+        default=None,
+        help="Author name for site metadata",
+    )
+    preview_parser.add_argument(
+        "--site_title",
+        default=None,
+        help="Site title shown in page header",
+    )
+    preview_parser.set_defaults(func=_preview_cmd)
 
     # ---- init command ----
     init_parser = subparsers.add_parser("init", help="Create a default configuration file")
