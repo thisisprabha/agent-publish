@@ -46,6 +46,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-011**: README rewrite — accurate feature list matching actual code, install from source instructions, CLI table, theme docs, architecture tree, contributing section, 5 example markdowns. | Completed: 2026-06-06
 - [x] **AP-038**: Interactive post preview — `--preview` spins up ephemeral HTTP server on :8765 with draft HTML, auto-adds `<meta name="robots" content="noindex">`. LiveReload on file change. SIGINT (Ctrl+C) stops server and deletes temp files. | Completed: 2026-06-08
 - [x] **AP-032**: Example gallery — pre-built HTML for all themes (6 markdowns × 3 themes = 18 HTML files) | Completed: 2026-06-07
+- [x] **AP-041**: Upgrade default DESIGN.md theme system — 4 bug fixes (h2 left-bar, table WebKit, dark mode stepping, conditional Pygments CSS), serif display H1, 9-section DESIGN.md schema, new `editorial` theme (warm off-white, sienna accent, serif headlines). | Completed: 2026-06-09
 
 ---
 
@@ -65,8 +66,6 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 ## Ready (Next Up)
 
 - [ ] **AP-039**: YAML frontmatter schema extensibility — make frontmatter validation pluggable. User can supply custom `.agent_publish_schema.yaml` in repo root. If found, merge with built-in schema. Support `required` fields, `type` (str/int/date/bool/list), `default`, `one_of` enum. Validate on every build. | Est: 90min | Skills: python, yaml
-
-- [x] **AP-041**: Upgrade default DESIGN.md theme system — inspired by open-design.ai editorial principles. Current default theme has 4 bugs + weak design: (1) `border-top` on h2 should be a left accent bar (`border-left: 3px solid var(--accent)`) not a top rule; (2) `border-collapse:collapse` + `border-radius` + `overflow:hidden` on tables breaks in WebKit — border-radius never renders; (3) dark mode is broken: `--surface:#000000` == `--bg:#000000`, tables invisible in dark mode; (4) 150+ lines of Pygments CSS injected even when there are no code blocks. Design goals: strong typographic hierarchy (display serif H1, weight/size variation across H2/H3/body/meta/eyebrow), clean hairline-only table rows (no box-border), TOC as slim left-ruled list not a box, dark mode with luminance-stepped surfaces. Reference: `nexu-io/open-design` DESIGN.md format — 9-section schema covering palette, type, spacing, elevation, do/don'ts. Ship an updated `design_themes/default/DESIGN.md` that an agent can read and regenerate the CSS from. Also add a second built-in theme `editorial` based on warm off-white (#FAFAF8), off-black (#1A1916), left-bar section accents, serif display headlines. | Est: 2h | Completed: 2026-06-09
 
 ---
 
