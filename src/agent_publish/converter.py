@@ -302,9 +302,10 @@ def convert_file(
     else:
         css = custom_css or DEFAULT_CSS
 
-    # Inline pygments CSS for syntax highlighting
-    pyg_css = HtmlFormatter(style="default").get_style_defs(".codehilite")
-    css = css + "\n" + pyg_css
+    # Inline pygments CSS only when code blocks are present
+    if '<div class="codehilite">' in html_body:
+        pyg_css = HtmlFormatter(style="default").get_style_defs(".codehilite")
+        css = css + "\n" + pyg_css
 
     date = date_str or __import__('datetime').datetime.now().strftime("%Y-%m-%d")
     slug = _clean_slug(title)

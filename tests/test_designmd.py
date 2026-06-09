@@ -182,7 +182,7 @@ def test_load_custom_path(tmp_path: Path):
 
 
 def test_themes_dict_keys():
-    assert set(THEMES.keys()) == {"default", "minimal", "brutalist"}
+    assert set(THEMES.keys()) == {"default", "minimal", "brutalist", "editorial"}
 
 
 def test_every_builtin_theme_loads():
