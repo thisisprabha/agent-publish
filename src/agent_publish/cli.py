@@ -12,6 +12,7 @@ from rich.table import Table
 from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .index import generate_index_and_feed
+from .linter import lint_code_blocks
 from .publisher import GitPublisher
 from .preview import PreviewServer
 from .validator import AntiSlopChecker, Validator
@@ -61,6 +62,7 @@ def _publish_cmd(args):
         humanize=args.humanize,
         tldr=args.tldr,
         tags=args.tags,
+        lint_code=args.lint_code,
     )
 
     # Resolve skill template and assets if requested
@@ -145,6 +147,29 @@ def _publish_cmd(args):
                     f"{len(warnings)}{' (strict)' if not errors else ''}[/red]"
                 )
                 sys.exit(1)
+
+        # Optional code lint pass
+        if cfg.lint_code:
+            md_content = input_path.read_text(encoding="utf-8")
+            with console.status(f"[yellow]Linting code blocks in {input_path.name}...[/yellow]"):
+                report = lint_code_blocks(
+                    md_content,
+                    source_name=input_path.name,
+                    output_dir=result.output_path.parent,
+                )
+            if report.get("blocks_total", 0) == 0:
+                console.print(f"[dim]  No Python code blocks found in {input_path.name}[/dim]")
+            elif "error" in report:
+                console.print(f"[yellow]⚠[/yellow]  Lint skipped: {report['error']}")
+            else:
+                if report["total_violations"] == 0:
+                    console.print(f"[green]✓[/green]  All {report['blocks_total']} Python code block(s) clean")
+                else:
+                    console.print(
+                        f"[yellow]⚠[/yellow]  {report['blocks_with_issues']}/{report['blocks_total']} "
+                        f"block(s) with {report['total_violations']} violation(s) — "
+                        f"[dim]see {report.get('source', '')} code_report.json[/dim]"
+                    )
 
         # Publish (unless dry-run)
         if not args.dry_run:
@@ -651,6 +676,12 @@ def main():
         "--progress",
         action="store_true",
         help="Show a sticky scroll-progress bar at the top of the page",
+    )
+    pub_parser.add_argument(
+        "--lint-code",
+        action="store_true",
+        dest="lint_code",
+        help="Run ruff check on extracted Python code blocks and emit code_report.json",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 
