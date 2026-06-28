@@ -36,6 +36,7 @@ class Config:
     tldr: bool = False
     tags: bool = False
     smart_typography: bool = False
+    progress: bool = False
 
 
 def _find_config_file() -> Optional[Path]:
@@ -111,6 +112,7 @@ def load_config(path: Optional[Path] = None) -> Config:
         show_toc=output.get("show_toc", True),
         strict=validation.get("strict", False),
         direction=output.get("direction", None),
+        progress=output.get("progress", False),
     )
 
     if cfg.favicon is not None and not cfg.favicon.exists():
@@ -168,6 +170,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "tldr": "tldr",
         "tags": "tags",
         "smart_typography": "smart_typography",
+        "progress": "progress",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)

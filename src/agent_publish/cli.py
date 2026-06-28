@@ -647,6 +647,11 @@ def main():
         action="store_true",
         help="Apply smart typography (em-dashes, curly quotes, ellipsis) to prose text",
     )
+    pub_parser.add_argument(
+        "--progress",
+        action="store_true",
+        help="Show a sticky scroll-progress bar at the top of the page",
+    )
     pub_parser.set_defaults(func=_publish_cmd)
 
     # ---- index command ----
@@ -819,6 +824,11 @@ def main():
         "--site_title",
         default=None,
         help="Site title shown in page header",
+    )
+    preview_parser.add_argument(
+        "--progress",
+        action="store_true",
+        help="Show a sticky scroll-progress bar at the top of the page",
     )
     preview_parser.set_defaults(func=_preview_cmd)
 
