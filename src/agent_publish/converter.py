@@ -136,6 +136,111 @@ def _inject_mermaid(html: str) -> str:
     return html
 
 
+def _enhance_toc(toc_html: str) -> str:
+    """Add section numbering and collapsible <details> to TOC HTML.
+
+    Injects hierarchical numbering (1., 1.1, 1.1.1) into link text and wraps
+    nested <ul> groups inside <details> elements so subsections can be collapsed.
+    """
+    if not toc_html:
+        return toc_html
+
+    inner = toc_html
+    m = re.match(r'<div class="toc">\s*(.*?)\s*</div>', inner, re.DOTALL)
+    if m:
+        inner = m.group(1)
+
+    tokens = re.split(r'(<[^>]+>)', inner)
+
+    depth = 0
+    counters = [0, 0, 0, 0, 0]
+    in_li = False
+    sub_ul_open = False
+    result = []
+
+    for token in tokens:
+        if not token:
+            continue
+
+        if token == '<li>':
+            result.append(token)
+            counters[depth] += 1
+            for d in range(depth + 1, len(counters)):
+                counters[d] = 0
+            in_li = True
+            sub_ul_open = False
+        elif token == '</li>':
+            if sub_ul_open:
+                result.append('</ul></details>')
+                sub_ul_open = False
+            result.append(token)
+            in_li = False
+        elif token == '<ul>':
+            if depth >= 1 and in_li:
+                result.append(
+                    '<details class="toc-sub">'
+                    '<summary><span class="toc-toggle"></span></summary><ul>'
+                )
+                sub_ul_open = True
+            else:
+                result.append(token)
+            depth += 1
+        elif token == '</ul>':
+            if not sub_ul_open:
+                result.append(token)
+            depth -= 1
+        elif token.startswith('<a'):
+            href_match = re.search(r'href="([^"]*)"', token)
+            text_match = re.search(r'>(.*?)</a>', token)
+            if href_match and text_match:
+                href = href_match.group(1)
+                text = text_match.group(1)
+                parts = [str(counters[d]) for d in range(1, depth + 1) if counters[d] > 0]
+                number = '.'.join(parts) + '.'
+                result.append(f'<a href="{href}">{number} {text}</a>')
+            else:
+                result.append(token)
+        else:
+            result.append(token)
+
+    return ''.join(result)
+
+
+def _toc_scroll_spy_script() -> str:
+    """Return an inline <script> block that highlights the active TOC link
+    as the user scrolls, using IntersectionObserver."""
+    return (
+        '<script>\n'
+        '(function(){\n'
+        '  var links=document.querySelectorAll(\'.toc a[href^="#"]\');\n'
+        '  var map=[];\n'
+        '  links.forEach(function(a){'
+        'var id=a.getAttribute("href").slice(1);'
+        'var el=document.getElementById(id);'
+        'if(el)map.push({el:el,a:a});'
+        '});\n'
+        '  if(!map.length)return;\n'
+        '  var active=null;\n'
+        '  var obs=new IntersectionObserver(function(entries){\n'
+        '    entries.forEach(function(e){\n'
+        '      var pair=map.find(function(p){return p.el===e.target});\n'
+        '      if(!pair)return;\n'
+        '      if(e.isIntersecting){\n'
+        '        if(active)active.classList.remove("toc-active");\n'
+        '        pair.a.classList.add("toc-active");\n'
+        '        active=pair.a;\n'
+        '      }else if(pair.a===active){\n'
+        '        pair.a.classList.remove("toc-active");\n'
+        '        active=null;\n'
+        '      }\n'
+        '    });\n'
+        '  },{rootMargin:"-80px 0px -70% 0px",threshold:0});\n'
+        '  map.forEach(function(p){obs.observe(p.el)});\n'
+        '})();\n'
+        '</script>'
+    )
+
+
 def _clean_slug(title: str) -> str:
     """Generate URL-safe slug from title."""
     cleaned = re.sub(
@@ -279,7 +384,9 @@ def convert_file(
 
     # If TOC has at least 2 entries (meaningful nav) and show_toc is True, wrap and prepend
     if show_toc and toc_html and toc_html.count('<a href="#') >= 2:
-        toc_nav = f'<nav class="toc">{toc_html}</nav>\n'
+        enhanced_toc = _enhance_toc(toc_html)
+        scroll_spy = _toc_scroll_spy_script()
+        toc_nav = f'<nav class="toc">{enhanced_toc}</nav>\n{scroll_spy}'
         html_body = toc_nav + html_body
 
     # Auto TL;DR injection
