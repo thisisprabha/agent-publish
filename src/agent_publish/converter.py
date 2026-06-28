@@ -306,6 +306,7 @@ def convert_file(
     humanize: bool = False,
     tldr: bool = False,
     tags: bool = False,
+    smart_typography: bool = False,
 ) -> ConversionResult:
     """Convert markdown file to HTML.
 
@@ -381,6 +382,11 @@ def convert_file(
     # Fallback: strip any remaining highlighted mermaid wrappers in HTML
     if mermaid:
         html_body = _unwrap_mermaid(html_body)
+
+    # Smart typography post-processing
+    if smart_typography:
+        from agent_publish.smart_typography import apply_smart_typography
+        html_body = apply_smart_typography(html_body)
 
     # If TOC has at least 2 entries (meaningful nav) and show_toc is True, wrap and prepend
     if show_toc and toc_html and toc_html.count('<a href="#') >= 2:

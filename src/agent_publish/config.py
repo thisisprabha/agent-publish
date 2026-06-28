@@ -35,6 +35,7 @@ class Config:
     humanize: bool = False
     tldr: bool = False
     tags: bool = False
+    smart_typography: bool = False
 
 
 def _find_config_file() -> Optional[Path]:
@@ -166,6 +167,7 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "humanize": "humanize",
         "tldr": "tldr",
         "tags": "tags",
+        "smart_typography": "smart_typography",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)

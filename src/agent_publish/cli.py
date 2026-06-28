@@ -642,6 +642,11 @@ def main():
         action="store_true",
         help="Inject auto-suggested topic tags under the title (uses LLM if key set; zero-token fallback if not)",
     )
+    pub_parser.add_argument(
+        "--smart-typography",
+        action="store_true",
+        help="Apply smart typography (em-dashes, curly quotes, ellipsis) to prose text",
+    )
     pub_parser.set_defaults(func=_publish_cmd)
 
     # ---- index command ----
