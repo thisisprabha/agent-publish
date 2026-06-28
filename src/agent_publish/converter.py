@@ -241,6 +241,9 @@ def convert_file(
     title = _extract_title(md_content)
     fingerprint = _generate_fingerprint(md_content)
 
+    # Save original markdown for footnote detection before mermaid extraction
+    md_original = md_content
+
     # Pre-extract mermaid blocks so they bypass syntax highlighting
     mermaid_blocks: List[str] = []
     if mermaid:
@@ -295,6 +298,11 @@ def convert_file(
                 [f'<span class="tag">#{t}</span>' for t in tag_list]
             ) + '</div>\n'
             html_body = tag_html + html_body
+
+    # Post-process footnotes: detect definitions, render refs + footnotes section
+    if '[^' in md_original:
+        from agent_publish.footnotes import process_footnotes
+        html_body = process_footnotes(md_original, html_body)
 
     # Resolve CSS
     if custom_css_path and custom_css_path.exists():

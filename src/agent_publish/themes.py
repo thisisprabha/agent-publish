@@ -53,6 +53,16 @@ pre code{background:none;padding:0;font-size:inherit}
 .tag-bar{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:1.5rem}
 .tag{display:inline-block;padding:.18rem .5rem;border-radius:99px;font-size:.75rem;background:var(--surface);color:var(--fg-muted);border:1px solid var(--border);line-height:1.4}
 .tag:before{content:"";display:inline-block;width:.25rem;height:.25rem;border-radius:99px;background:var(--accent);margin-right:.25rem;vertical-align:middle;opacity:.7}
+.footnotes-sep{border:0;border-top:1px solid var(--border);margin-top:2.5rem}
+.footnotes{font-size:.8125rem;color:var(--muted);margin-top:.75rem}
+.footnotes-list{padding-left:1.5rem;margin:0}
+.footnotes-list li{margin-bottom:.4rem}
+.footnotes-list p{display:inline;margin:0}
+.footnote-ref{font-size:.8em;position:relative;top:-.35em;scroll-margin-top:2rem}
+.footnote-ref a{color:var(--accent);border-bottom:0;text-decoration:none}
+.footnote-ref a:hover{text-decoration:underline}
+.footnote-backref{font-size:.85em;text-decoration:none;color:var(--muted);border-bottom:0;margin-left:.3em}
+.footnote-backref:hover{color:var(--accent)}
 @media (max-width:640px){html{font-size:15px}header,.main{padding:1rem}h1{font-size:1.35rem}h2{font-size:1.05rem}table{font-size:.8rem;display:block;overflow-x:auto}pre{padding:.75rem}.toc{padding:.75rem}}
 @media (max-width:1024px){header,.main{padding:1.25rem}}
 @media print{body{background:#fff}a[href]:after{content:" (" attr(href) ")";font-size:.75rem;color:var(--muted)}.back{display:none}.toc{display:none}.skip-link{display:none}}
@@ -95,6 +105,16 @@ tr{transition:background .12s}
 tr:hover{background:rgba(0,0,0,.04)}
 th,td{text-align:left;padding:.4rem .8rem;border-bottom:1px solid #ddd}
 th{font-weight:500;border-bottom:2px solid #111}
+.footnotes-sep{border:0;border-top:1px solid #ddd;margin-top:2.5rem}
+.footnotes{font-size:.8125rem;color:var(--muted);margin-top:.75rem}
+.footnotes-list{padding-left:1.5rem;margin:0}
+.footnotes-list li{margin-bottom:.4rem}
+.footnotes-list p{display:inline;margin:0}
+.footnote-ref{font-size:.8em;position:relative;top:-.35em;scroll-margin-top:2rem}
+.footnote-ref a{color:var(--accent);text-decoration:none}
+.footnote-ref a:hover{text-decoration:underline}
+.footnote-backref{font-size:.85em;text-decoration:none;color:var(--muted);margin-left:.3em}
+.footnote-backref:hover{color:var(--fg)}
 @media (max-width:640px){body{padding:1rem;font-size:.95rem}h1{font-size:1.3rem}h2{font-size:1rem}table{display:block;overflow-x:auto}pre{padding:.75rem}}
 @media (max-width:1024px){body{padding:1.5rem}}
 @media print{body{background:#fff}h2{border-top-color:#bbb}a[href]:after{content:" (" attr(href) ")";font-size:.75rem;color:var(--muted)}.skip-link{display:none}}
@@ -153,6 +173,16 @@ blockquote{border-left:2px solid var(--accent);margin:1.5rem 0;padding:.5rem 0 .
 .toc a{color:var(--accent);text-decoration:none}
 .toc a:hover{text-decoration:underline}
 .toc a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.footnotes-sep{border:0;border-top:1px solid var(--accent);margin-top:2.5rem}
+.footnotes{font-size:.8125rem;color:var(--dim);margin-top:.75rem}
+.footnotes-list{padding-left:1.5rem;margin:0}
+.footnotes-list li{margin-bottom:.4rem}
+.footnotes-list p{display:inline;margin:0}
+.footnote-ref{font-size:.8em;position:relative;top:-.35em;scroll-margin-top:2rem}
+.footnote-ref a{color:var(--accent);text-decoration:none}
+.footnote-ref a:hover{background:var(--accent);color:var(--bg)}
+.footnote-backref{font-size:.85em;text-decoration:none;color:var(--dim);margin-left:.3em}
+.footnote-backref:hover{color:var(--fg)}
 @media (max-width:640px){body{padding:1rem;font-size:.875rem}h1,h2{padding:.35rem;font-size:1.1rem}h3{font-size:.85rem}pre{padding:.75rem}table{font-size:.8rem}.toc{padding:.75rem}}
 @media (max-width:1024px){body{padding:1.25rem}}
 @media print{body{background:#fff;color:#000}a{color:#000;text-decoration:underline}h1,h2{border-color:#000}code,pre{background:#f5f5f5;color:#000}th,td{border-color:#000}.skip-link{display:none}.back{display:none}.toc{display:none}}
