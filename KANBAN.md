@@ -47,6 +47,11 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-038**: Interactive post preview — `--preview` spins up ephemeral HTTP server on :8765 with draft HTML, auto-adds `<meta name="robots" content="noindex">`. LiveReload on file change. SIGINT (Ctrl+C) stops server and deletes temp files. | Completed: 2026-06-08
 - [x] **AP-032**: Example gallery — pre-built HTML for all themes (6 markdowns × 3 themes = 18 HTML files) | Completed: 2026-06-07
 - [x] **AP-041**: Upgrade default DESIGN.md theme system — 4 bug fixes (h2 left-bar, table WebKit, dark mode stepping, conditional Pygments CSS), serif display H1, 9-section DESIGN.md schema, new `editorial` theme (warm off-white, sienna accent, serif headlines). | Completed: 2026-06-09
+- [x] **AP-042**: Markdown footnotes support with back-links and CSS — `[^1]` syntax, auto-numbered, hover backlink, `.footnotes` CSS in all themes. | Completed: 2026-06-28
+- [x] **AP-043**: TOC section numbering, collapsible nesting, scroll-spy — numbered TOC entries, `<details>` collapsible, IntersectionObserver scroll tracking. | Completed: 2026-06-28
+- [x] **AP-044**: Smart typography post-processing — `--smart-typography` flag, curly quotes, em-dashes, ellipsis, orphan control via `smart_typography.py`. | Completed: 2026-06-28
+- [x] **AP-045**: Reading progress bar via `--progress` flag — scroll-linked top bar, CSS-only, works on all themes. | Completed: 2026-06-28
+- [x] **AP-046**: Code quality checks via `--lint-code` flag with ruff — `ruff check` integrated into publish pipeline, config.py wiring for linting. | Completed: 2026-06-28
 
 ---
 
@@ -58,8 +63,7 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## In Progress
 
-- [ ] **AP-036**: Multi-format export plugin — `--format epub,pdf` alongside `--to-gh`. Hook-based architecture: `register_exporter(ext, callable)`. Built-in: markdown (passthrough), html (default), epub (zip-based), pdf (weasyprint optional). | Est: 90min | Skills: python, hooks
-- [ ] **AP-037**: Image optimization pipeline — when `--optimize-images` passed, compress JPEG/PNG in-place, convert oversized PNG → WebP, strip EXIF. Zero dependencies: pure Python PIL or skip. Generate `images_report.json` with before/after sizes. | Est: 75min | Skills: python, image-processing
+*Nothing in progress.*
 
 ---
 
@@ -74,6 +78,11 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 ### Phase 6: Optional AI enhancements (tokens only when user opts in)
 
 *All Phase 6 tasks promoted to Ready.*
+
+### Phase 7: Export & Pipeline
+
+- [ ] **AP-036**: Multi-format export plugin — `--format epub,pdf` alongside `--to-gh`. Hook-based architecture: `register_exporter(ext, callable)`. Built-in: markdown (passthrough), html (default), epub (zip-based), pdf (weasyprint optional). | Est: 90min | Skills: python, hooks
+- [ ] **AP-037**: Image optimization pipeline — when `--optimize-images` passed, compress JPEG/PNG in-place, convert oversized PNG → WebP, strip EXIF. Zero dependencies: pure Python PIL or skip. Generate `images_report.json` with before/after sizes. | Est: 75min | Skills: python, image-processing
 
 ---
 
