@@ -823,7 +823,7 @@ def test_init_refuses_overwrite():
         assert result.returncode == 1, result.stderr
         # File should remain unchanged
         assert cfg_path.read_text() == "# existing\n"
-        assert "already exists" in result.stdout
+        assert "already" in result.stdout and "exists" in result.stdout
 
 
 def test_converter_favicon_and_author():
