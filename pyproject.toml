@@ -41,6 +41,7 @@ agent-publish = "agent_publish.cli:main"
 [project.urls]
 Homepage = "https://github.com/thisisprabha/agent-publish"
 Repository = "https://github.com/thisisprabha/agent-publish"
+Documentation = "https://thisisprabha.github.io/agent-publish"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/agent_publish"]

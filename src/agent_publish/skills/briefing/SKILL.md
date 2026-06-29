@@ -1,3 +1,13 @@
+---
+name: briefing
+description: Compact, scannable layout ideal for daily stand-ups, internal memos, and project rundowns.
+version: "1.0.0"
+author: agent-publish
+tags: [briefing, memo, update, daily, compact]
+license: MIT
+homepage: https://github.com/thisisprabha/agent-publish
+---
+
 # Briefing
 
 Output type for compact, scannable updates.

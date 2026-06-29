@@ -1,3 +1,13 @@
+---
+name: article
+description: Long-form narrative layout optimized for essays, reports, and research posts.
+version: "1.0.0"
+author: agent-publish
+tags: [article, essay, report, long-form, editorial]
+license: MIT
+homepage: https://github.com/thisisprabha/agent-publish
+---
+
 # Article
 
 Output type for long-form, narrative content.

@@ -38,6 +38,9 @@ class Config:
     smart_typography: bool = False
     progress: bool = False
     lint_code: bool = False
+    validate_frontmatter: bool = False
+    optimize_images: bool = False
+    export_formats: str = ""
 
 
 def _find_config_file() -> Optional[Path]:
@@ -115,6 +118,9 @@ def load_config(path: Optional[Path] = None) -> Config:
         direction=output.get("direction", None),
         progress=output.get("progress", False),
         lint_code=output.get("lint_code", False),
+        validate_frontmatter=output.get("validate_frontmatter", False),
+        optimize_images=output.get("optimize_images", False),
+        export_formats=output.get("export_formats", ""),
     )
 
     if cfg.favicon is not None and not cfg.favicon.exists():
@@ -174,6 +180,9 @@ def merge_with_cli_args(cfg: Config, **cli_args) -> Config:
         "smart_typography": "smart_typography",
         "progress": "progress",
         "lint_code": "lint_code",
+        "validate_frontmatter": "validate_frontmatter",
+        "optimize_images": "optimize_images",
+        "export_formats": "export_formats",
     }
     for cli_key, cfg_key in field_map.items():
         val = cli_args.get(cli_key)

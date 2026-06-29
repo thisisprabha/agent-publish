@@ -1,5 +1,9 @@
 # agent-publish
 
+[![PyPI version](https://img.shields.io/pypi/v/agentpub.svg)](https://pypi.org/project/agentpub/)
+[![CI](https://github.com/thisisprabha/agent-publish/actions/workflows/ci.yml/badge.svg)](https://github.com/thisisprabha/agent-publish/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Markdown-to-HTML pipeline for AI agents.
 
 Converts research outputs, logs, and agent artifacts into clean, styled HTML and publishes to GitHub Pages.

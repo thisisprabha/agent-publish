@@ -52,6 +52,14 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 - [x] **AP-044**: Smart typography post-processing — `--smart-typography` flag, curly quotes, em-dashes, ellipsis, orphan control via `smart_typography.py`. | Completed: 2026-06-28
 - [x] **AP-045**: Reading progress bar via `--progress` flag — scroll-linked top bar, CSS-only, works on all themes. | Completed: 2026-06-28
 - [x] **AP-046**: Code quality checks via `--lint-code` flag with ruff — `ruff check` integrated into publish pipeline, config.py wiring for linting. | Completed: 2026-06-28
+- [x] **AP-039**: YAML frontmatter schema extensibility — make frontmatter validation pluggable. User can supply custom `.agent_publish_schema.yaml` in repo root. If found, merge with built-in schema. Support `required` fields, `type` (str/int/date/bool/list), `default`, `one_of` enum. Validate on every build. | Completed: 2026-06-29
+- [x] **AP-053**: Multi-format export plugin — `--format epub,pdf,md` hook-based architecture: `register_exporter(ext, callable)`. Built-in: html (default), markdown (passthrough), epub (zip-based), pdf (weasyprint optional). | Completed: 2026-06-29
+- [x] **AP-054**: Image optimization pipeline — when `--optimize-images` passed, compress JPEG/PNG in-place, convert oversized PNG → WebP, strip EXIF. Zero dependencies: pure Python PIL or skip. Generate `images_report.json` with before/after sizes. | Completed: 2026-06-29
+- [x] **AP-047**: PyPI publish workflow — GitHub Actions workflow on tag push: `hatch build` → `twine upload`. Add `[project.urls]` with docs link. Test `pip install agentpub` from TestPyPI first, then real PyPI. Add badge to README. | Completed: 2026-06-29
+- [x] **AP-049**: Python API surface — expose `from agent_publish import convert, publish` as stable public API. `convert(md_str, theme, skill) → html_str`. `publish(md_path, config) → url`. Docstrings, type hints, `__all__` exports. Makes the tool embeddable in agent pipelines (n8n, cron, Claude Code hooks). | Completed: 2026-06-29
+- [x] **AP-050**: End-to-end integration example — single-file `examples/cron_overnight.py` showing: overnight agent run → markdown output → `agent_publish.convert()` → push to GitHub Pages. Second example: Claude Code post-hook script. README section "Use in your agent pipeline". | Completed: 2026-06-29
+- [x] **AP-051**: Agent Skills spec alignment — align `skills/` folder format with the `agentskills.io` spec (`gh skill` compatible). Add frontmatter metadata to each `SKILL.md`. Enable `gh skill install thisisprabha/agent-publish <skill-name>`. | Completed: 2026-06-29
+- [x] **AP-052**: Submit to awesome lists — PR to `awesome-agent-skills`, `awesome-llm-tools`, `awesome-python`. Write 1-line + 3-line descriptions. Requires PyPI link + demo site live (depends on AP-047, AP-048). | Completed: 2026-06-29
 
 ---
 
@@ -69,28 +77,13 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 
 ## Ready (Next Up)
 
-- [ ] **AP-047**: PyPI publish workflow — GitHub Actions workflow on tag push: `hatch build` → `twine upload`. Add `[project.urls]` with docs link. Test `pip install agentpub` from TestPyPI first, then real PyPI. Add badge to README. | Est: 60min | Skills: python, ci, github-actions
 - [ ] **AP-048**: Live demo site — deploy `thisisprabha.github.io/agent-publish` as a living gallery. Use agent-publish itself to generate the site from `examples/` markdowns across all themes + skills. Add GH Actions workflow to rebuild on push. Link from README hero section. | Est: 90min | Skills: html, github-pages, ci
-- [ ] **AP-049**: Python API surface — expose `from agent_publish import convert, publish` as stable public API. `convert(md_str, theme, skill) → html_str`. `publish(md_path, config) → url`. Docstrings, type hints, `__all__` exports. Makes the tool embeddable in agent pipelines (n8n, cron, Claude Code hooks). | Est: 75min | Skills: python, api-design
-- [ ] **AP-050**: End-to-end integration example — single-file `examples/cron_overnight.py` showing: overnight agent run → markdown output → `agent_publish.convert()` → push to GitHub Pages. Second example: Claude Code post-hook script. README section "Use in your agent pipeline". | Est: 60min | Skills: python, docs
 
 ---
 
 ## Backlog
 
-### Phase 8: Distribution & Discovery
-
-- [ ] **AP-051**: Agent Skills spec alignment — align `skills/` folder format with the `agentskills.io` spec (`gh skill` compatible). Add frontmatter metadata to each `SKILL.md`. Enable `gh skill install thisisprabha/agent-publish <skill-name>`. | Est: 90min | Skills: yaml, spec-compliance
-- [ ] **AP-052**: Submit to awesome lists — PR to `awesome-agent-skills`, `awesome-llm-tools`, `awesome-python`. Write 1-line + 3-line descriptions. Requires PyPI link + demo site live (depends on AP-047, AP-048). | Est: 30min | Skills: marketing, github
-
-### Phase 9: Schema & Extensibility
-
-- [ ] **AP-039**: YAML frontmatter schema extensibility — make frontmatter validation pluggable. User can supply custom `.agent_publish_schema.yaml` in repo root. If found, merge with built-in schema. Support `required` fields, `type` (str/int/date/bool/list), `default`, `one_of` enum. Validate on every build. | Est: 90min | Skills: python, yaml
-
-### Phase 10: Export & Pipeline
-
-- [ ] **AP-053**: Multi-format export plugin — `--format epub,pdf` alongside `--to-gh`. Hook-based architecture: `register_exporter(ext, callable)`. Built-in: markdown (passthrough), html (default), epub (zip-based), pdf (weasyprint optional). | Est: 90min | Skills: python, hooks
-- [ ] **AP-054**: Image optimization pipeline — when `--optimize-images` passed, compress JPEG/PNG in-place, convert oversized PNG → WebP, strip EXIF. Zero dependencies: pure Python PIL or skip. Generate `images_report.json` with before/after sizes. | Est: 75min | Skills: python, image-processing
+*Board is clear — all tasks finished.*
 
 ---
 
@@ -99,6 +92,15 @@ Cron reads only this file → executes Ready tasks → commits → pushes.
 *Shipped releases / abandoned ideas. Reference only.*
 
 ---
+
+## How This Works
+
+1. **Cron runs every 5h** via Hermes cron
+2. **Cron loads only**: `kanban-codex-lane` skill + this file
+3. **Picks top 2** from "Ready" column
+4. **Executes each card** → writes code → runs tests → commits → pushes
+5. **Moves cards** Ready → In Progress → Done
+6. **Telegram summary** sent to Prabha
 
 **Card format:**
 ```

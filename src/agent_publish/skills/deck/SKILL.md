@@ -1,3 +1,13 @@
+---
+name: deck
+description: Full-width presentation layout with larger type scale for slide-like documents and one-pagers.
+version: "1.0.0"
+author: agent-publish
+tags: [deck, presentation, slide, one-pager, wide]
+license: MIT
+homepage: https://github.com/thisisprabha/agent-publish
+---
+
 # Deck
 
 Output type for wide, presentation-style documents.

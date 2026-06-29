@@ -1,3 +1,13 @@
+---
+name: changelog
+description: Date-stamped list layout for release notes, version histories, and iteration logs.
+version: "1.0.0"
+author: agent-publish
+tags: [changelog, release, version, history, log]
+license: MIT
+homepage: https://github.com/thisisprabha/agent-publish
+---
+
 # Changelog
 
 Output type for dated release notes and iteration logs.

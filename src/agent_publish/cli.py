@@ -63,6 +63,9 @@ def _publish_cmd(args):
         tldr=args.tldr,
         tags=args.tags,
         lint_code=args.lint_code,
+        validate_frontmatter=args.validate_frontmatter,
+        optimize_images=args.optimize_images,
+        export_formats=args.export_formats,
     )
 
     # Resolve skill template and assets if requested
@@ -129,6 +132,41 @@ def _publish_cmd(args):
 
         console.print(f"[green]✓[/green] Converted: {result.title}")
 
+        # Optional frontmatter schema validation
+        if cfg.validate_frontmatter:
+            from agent_publish.schema import (
+                DEFAULT_SCHEMA,
+                apply_defaults,
+                extract_frontmatter,
+                load_user_schema,
+                merge_schemas,
+                validate_frontmatter,
+            )
+
+            md_raw = input_path.read_text(encoding="utf-8")
+            fm, _ = extract_frontmatter(md_raw)
+            if fm:
+                schema = DEFAULT_SCHEMA
+                user_schema = load_user_schema(Path(cfg.github_repo_path))
+                if user_schema:
+                    schema = merge_schemas(schema, user_schema)
+                    console.print(
+                        f"[dim]  Merged user schema from .agent_publish_schema.yaml[/dim]"
+                    )
+                validation_errors = validate_frontmatter(fm, schema)
+                if validation_errors:
+                    for err in validation_errors:
+                        sev = err["severity"]
+                        sev_icon = "[red]✗[/red]" if sev == "error" else "[yellow]⚠[/yellow]"
+                        console.print(f"{sev_icon}  [{sev}] {err['field']}: {err['error']}")
+                    if cfg.strict or any(e["severity"] == "error" for e in validation_errors):
+                        console.print("[red]Frontmatter validation failed[/red]")
+                        sys.exit(1)
+                else:
+                    console.print("[green]✓[/green]  Frontmatter valid")
+            else:
+                console.print("[dim]  No YAML frontmatter found — skipped validation[/dim]")
+
         # Anti-slop quality gate
         html_content = result.output_path.read_text(encoding="utf-8")
         checker = AntiSlopChecker()
@@ -170,6 +208,71 @@ def _publish_cmd(args):
                         f"block(s) with {report['total_violations']} violation(s) — "
                         f"[dim]see {report.get('source', '')} code_report.json[/dim]"
                     )
+
+        # Optional export to additional formats
+        if cfg.export_formats:
+            formats = [f.strip() for f in cfg.export_formats.split(",") if f.strip()]
+            if formats:
+                from agent_publish.exporters import export_result
+                from agent_publish.schema import DEFAULT_SCHEMA, apply_defaults, extract_frontmatter
+
+                md_raw = input_path.read_text(encoding="utf-8")
+                fm, _ = extract_frontmatter(md_raw)
+                frontmatter = apply_defaults(fm or {}, DEFAULT_SCHEMA)
+
+                export_meta = {
+                    "title": result.title,
+                    "author": cfg.author or frontmatter.get("author", "agent-publish"),
+                    "date": frontmatter.get("date", ""),
+                    "markdown": md_raw,
+                }
+                with console.status(
+                    f"[yellow]Exporting {', '.join(formats)}...[/yellow]"
+                ):
+                    exported = export_result(
+                        html_content,
+                        result.output_path,
+                        formats,
+                        export_meta,
+                    )
+                for fmt_in, exp_path in exported.items():
+                    if exp_path:
+                        console.print(f"[green]✓[/green]  Exported {fmt_in}: {exp_path.name}")
+                    else:
+                        console.print(f"[yellow]⚠[/yellow]  Export {fmt_in} failed or skipped")
+
+        # Optional image optimization
+        if cfg.optimize_images:
+            from agent_publish.image_optimizer import optimize_images, write_report
+
+            images_dir = result.output_path.parent / "images"
+            if images_dir.exists():
+                with console.status("[yellow]Optimizing images...[/yellow]"):
+                    img_report = optimize_images(images_dir)
+                report_path = write_report(img_report, result.output_path.parent)
+                if img_report.get("error"):
+                    console.print(f"[yellow]⚠[/yellow]  {img_report['error']}")
+                elif not img_report["report"]:
+                    console.print("[dim]  No images to optimize[/dim]")
+                else:
+                    saved_bytes = img_report["total_saved"]
+                    for entry in img_report["report"]:
+                        if entry["saved_bytes"] > 0:
+                            console.print(
+                                f"[green]✓[/green]  {entry['file']}: "
+                                f"{entry['original_bytes']} → {entry['after_bytes']} "
+                                f"({entry['saved_pct']}%) — {entry['action']}"
+                            )
+                        else:
+                            console.print(
+                                f"[dim]  {entry['file']}: {entry['action']}[/dim]"
+                            )
+                    console.print(
+                        f"[green]✓[/green]  Total saved: {saved_bytes} bytes "
+                        f"({img_report['total_saved_pct']}%) — report: {report_path.name}"
+                    )
+            else:
+                console.print("[dim]  No images directory found — nothing to optimize[/dim]")
 
         # Publish (unless dry-run)
         if not args.dry_run:
@@ -682,6 +785,24 @@ def main():
         action="store_true",
         dest="lint_code",
         help="Run ruff check on extracted Python code blocks and emit code_report.json",
+    )
+    pub_parser.add_argument(
+        "--validate-frontmatter",
+        action="store_true",
+        dest="validate_frontmatter",
+        help="Validate YAML frontmatter against schema (merges .agent_publish_schema.yaml if found)",
+    )
+    pub_parser.add_argument(
+        "--optimize-images",
+        action="store_true",
+        dest="optimize_images",
+        help="Compress JPEG/PNG in output, convert large PNG to WebP, strip EXIF, write images_report.json",
+    )
+    pub_parser.add_argument(
+        "--format",
+        default="",
+        dest="export_formats",
+        help="Export to additional formats (comma-separated: epub,pdf,md)",
     )
     pub_parser.set_defaults(func=_publish_cmd)
 
