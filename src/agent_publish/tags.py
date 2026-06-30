@@ -6,13 +6,12 @@ When `--tags` is passed, this module:
   3. Returns a deduplicated, ranked list of 3-8 tags.
 """
 
+import json
 import os
 import re
-import json
 import urllib.request
 from collections import Counter
 from typing import List, Optional
-
 
 # Common English stop words to filter out
 _STOP_WORDS = frozenset({

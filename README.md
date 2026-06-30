@@ -17,7 +17,7 @@ The **"3 AM problem"**: You run overnight research, get markdown output... now w
 ## Quick Start
 
 ```bash
-pip install agentpub
+pip install agent-publish
 
 # Convert and publish in one command
 agent-publish publish research.md --url https://user.github.io/repo
@@ -100,7 +100,7 @@ Built-in `AntiSlopChecker` catches marketing filler, broken heading hierarchy, e
 ## Install
 
 ```bash
-pip install agentpub
+pip install agent-publish
 ```
 
 From source:

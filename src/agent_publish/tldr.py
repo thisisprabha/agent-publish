@@ -11,7 +11,6 @@ import os
 import re
 from typing import Optional
 
-
 _DEFAULT_PROMPT = """Summarize the following article in exactly 2-3 clear sentences.
 Preserve the key insight. Do not add preamble. Return only the summary.
 
@@ -91,8 +90,8 @@ def generate_tldr(
     prompt = (prompt_template or _DEFAULT_PROMPT).format(content=md_content)
 
     try:
-        import urllib.request
         import json
+        import urllib.request
 
         headers = {
             "Content-Type": "application/json",

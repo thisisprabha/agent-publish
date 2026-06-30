@@ -5,8 +5,6 @@ Built-in: html, md, epub, pdf.
 """
 
 import re
-import shutil
-import tempfile
 import zipfile
 from pathlib import Path
 from typing import Callable, Dict, List, Optional

@@ -5,7 +5,6 @@ from pathlib import Path
 
 import pytest
 
-
 # ---- AP-039: Schema tests ----
 
 
@@ -132,7 +131,7 @@ def test_apply_defaults_no_override():
 
 
 def test_register_exporter():
-    from agent_publish.exporters import _exporters, register_exporter, get_exporter
+    from agent_publish.exporters import _exporters, get_exporter, register_exporter
 
     def custom_exporter(html, path, meta):
         return path
@@ -288,7 +287,7 @@ def test_optimize_jpeg():
         img_path = img_dir / "photo.jpg"
         img = Image.new("RGB", (100, 100), color="red")
         img.save(str(img_path), format="JPEG", quality=95)
-        original = img_path.stat().st_size
+        img_path.stat().st_size
 
         report = optimize_images(img_dir)
         assert report["report"]
@@ -308,7 +307,7 @@ def test_optimize_png_to_webp():
         img_path = img_dir / "big.png"
         img = Image.new("RGB", (800, 600), color="blue")
         img.save(str(img_path), format="PNG")
-        original = img_path.stat().st_size
+        img_path.stat().st_size
 
         report = optimize_images(img_dir, max_png_bytes=1)
         assert report["report"]

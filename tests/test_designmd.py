@@ -153,7 +153,7 @@ def test_list_themes():
 
 def test_load_default_theme():
     css = load("default")
-    assert "--bg:" in css
+    assert "--color-bg:" in css
     assert "font-family" in css
 
 

@@ -1,14 +1,12 @@
 """Tests for the tags module."""
 
-from unittest.mock import patch, MagicMock
-import pytest
+from unittest.mock import MagicMock, patch
 
 from agent_publish.tags import (
-    _get_api_config,
     _clean_tag,
     _simple_stem,
-    suggest_tags_zero_token,
     suggest_tags,
+    suggest_tags_zero_token,
 )
 
 
@@ -114,7 +112,7 @@ def test_suggest_tags_with_key(monkeypatch):
     import json
     monkeypatch.setenv("AGENT_PUBLISH_API_KEY", "sk-test")
     md = "# Hello\n\nContent."
-    fence = chr(96)*3 + "json"
+    chr(96)*3 + "json"
     def _urlopen(*a, **kw):
         resp = MagicMock()
         resp.read.return_value = json.dumps(

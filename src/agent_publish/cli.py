@@ -13,8 +13,8 @@ from .config import load_config, merge_with_cli_args
 from .converter import convert_file
 from .index import generate_index_and_feed
 from .linter import lint_code_blocks
-from .publisher import GitPublisher
 from .preview import PreviewServer
+from .publisher import GitPublisher
 from .validator import AntiSlopChecker, Validator
 from .watch import WatchServer
 
@@ -151,7 +151,7 @@ def _publish_cmd(args):
                 if user_schema:
                     schema = merge_schemas(schema, user_schema)
                     console.print(
-                        f"[dim]  Merged user schema from .agent_publish_schema.yaml[/dim]"
+                        "[dim]  Merged user schema from .agent_publish_schema.yaml[/dim]"
                     )
                 validation_errors = validate_frontmatter(fm, schema)
                 if validation_errors:
@@ -214,7 +214,11 @@ def _publish_cmd(args):
             formats = [f.strip() for f in cfg.export_formats.split(",") if f.strip()]
             if formats:
                 from agent_publish.exporters import export_result
-                from agent_publish.schema import DEFAULT_SCHEMA, apply_defaults, extract_frontmatter
+                from agent_publish.schema import (
+                    DEFAULT_SCHEMA,
+                    apply_defaults,
+                    extract_frontmatter,
+                )
 
                 md_raw = input_path.read_text(encoding="utf-8")
                 fm, _ = extract_frontmatter(md_raw)

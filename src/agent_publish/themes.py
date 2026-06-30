@@ -266,6 +266,15 @@ def load(theme: str, custom_path: Optional[Path] = None, design_path: Optional[P
         return designmd.generate_css(parsed)
     if custom_path:
         return custom_path.read_text(encoding='utf-8')
+
+    # For built-in themes, prefer DESIGN.md + base.css over hardcoded strings
+    if theme in THEMES:
+        design_candidate = _package_themes_dir() / theme / "DESIGN.md"
+        if design_candidate.exists():
+            from . import designmd
+            parsed = designmd.load_design(design_candidate)
+            return designmd.generate_css(parsed)
+
     return THEMES.get(theme, DEFAULT_CSS)
 
 

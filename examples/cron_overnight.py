@@ -21,13 +21,12 @@ Configuration:
 """
 
 import argparse
-import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from textwrap import dedent
 
-from agent_publish import Config, convert, load_config, publish
+from agent_publish import convert, load_config, publish
 
 
 def simulate_agent_run() -> str:

@@ -1,15 +1,9 @@
 """Tests for preview mode."""
 
-import os
-import socket
-import tempfile
-import threading
 import time
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
-
 
 # Skip all preview tests if watchdog is not installed
 try:

@@ -38,6 +38,6 @@ jobs:
       - name: Test install from wheel
         run: |
           pip uninstall -y agentpub
-          pip install dist/agentpub-*.whl
+          pip install dist/agent_publish-*.whl
           agent-publish --version
           agent-publish --help

@@ -20,10 +20,10 @@ import sys
 from pathlib import Path
 
 from agent_publish import (
-    Config,
-    ConversionResult,
     convert_file,
     load_config,
+)
+from agent_publish import (
     publish as api_publish,
 )
 from agent_publish.themes import load as load_theme
@@ -147,7 +147,7 @@ def main() -> None:
 
     # 4. Publish
     if args.dry_run:
-        print(f"Dry run — skipping publish")
+        print("Dry run — skipping publish")
     else:
         print("Publishing...")
         pub = api_publish(

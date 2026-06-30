@@ -1,15 +1,12 @@
 """Tests for the tldr module."""
 
-from unittest.mock import patch, MagicMock
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 from agent_publish.tldr import (
     _get_api_config,
     extract_first_paragraph,
     generate_tldr,
 )
-
 
 # ── _get_api_config ──────────────────────────────────────────────────────────
 

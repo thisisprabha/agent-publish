@@ -1,11 +1,9 @@
 """Preview mode: ephemeral HTTP server for draft HTML with LiveReload."""
 
 import http.server
-import os
 import shutil
 import signal
 import socketserver
-import sys
 import tempfile
 import threading
 import time
@@ -259,7 +257,7 @@ class PreviewServer:
 
         print(f"  [preview] draft built: {output_path.name}")
         print(f"  [preview] serving at {file_url}")
-        print(f"  [preview] press Ctrl+C to stop and cleanup\n")
+        print("  [preview] press Ctrl+C to stop and cleanup\n")
 
         # Start HTTP server in background thread
         server_thread = threading.Thread(target=self._serve, daemon=True)

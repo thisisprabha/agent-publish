@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agentpub"
+name = "agent-publish"
 version = "0.1.0"
 description = "Markdown-to-HTML pipeline for AI agents"
 readme = "README.md"

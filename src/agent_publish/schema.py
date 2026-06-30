@@ -8,7 +8,6 @@ from datetime import date as date_type
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-
 DEFAULT_SCHEMA: Dict[str, Dict[str, Any]] = {
     "title": {"type": "str", "required": False},
     "date": {"type": "str", "required": False},

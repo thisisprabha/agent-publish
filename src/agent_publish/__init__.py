@@ -7,12 +7,13 @@ __version__ = "0.1.0"
 
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from .assets import copy_assets
 from .config import Config, load_config
 from .converter import ConversionResult, convert_file
-from .publisher import GitPublisher, PublishResult, publish as _publish_file
+from .publisher import GitPublisher, PublishResult
+from .publisher import publish as _publish_file
 
 
 def convert(
@@ -175,4 +176,5 @@ __all__ = [
     "Config",
     "load_config",
     "GitPublisher",
+    "_publish_file",
 ]
