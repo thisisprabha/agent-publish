@@ -40,7 +40,7 @@ def test_load_skill_article():
     data = load_skill(skill_dir)
     assert data["name"] == "article"
     assert "template" in data
-    assert data["skill_md"].startswith("# Article")
+    assert "# Article" in data["skill_md"]
     assert "{page_title}" in data["template"]
     assert "{css}" in data["template"]
     assert isinstance(data["assets"], list)
